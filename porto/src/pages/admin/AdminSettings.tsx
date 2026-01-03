@@ -50,7 +50,7 @@ export const AdminSettings = () => {
 
   const adminEmail = localStorage.getItem("admin")
     ? JSON.parse(localStorage.getItem("admin")!).email
-    : "admin@portfolio.com";
+    : "admin@4leafclover.id";
 
   return (
     <div className="space-y-6">

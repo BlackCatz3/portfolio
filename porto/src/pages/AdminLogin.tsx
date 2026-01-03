@@ -91,7 +91,7 @@ export const AdminLogin = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@portfolio.com"
+                    placeholder="admin@4leafclover.id"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -140,12 +140,6 @@ export const AdminLogin = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-border/50 text-center">
-            <p className="text-xs text-muted-foreground">
-              Default credentials: admin@portfolio.com / admin123
-            </p>
-          </div>
         </div>
 
         <div className="text-center mt-6">
