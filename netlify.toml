@@ -1,0 +1,12 @@
+[build]
+  base = "porto"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_API_BASE_URL = "http://43.228.213.128/api"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
