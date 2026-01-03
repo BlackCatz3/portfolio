@@ -1,0 +1,182 @@
+### Portfolio CMS API Examples
+### Gunakan dengan REST Client extension di VS Code atau Postman
+
+@baseUrl = http://localhost:5000
+@token = your_jwt_token_here
+
+### Health Check
+GET {{baseUrl}}/health
+
+### ============================================
+### AUTHENTICATION
+### ============================================
+
+### Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@portfolio.com",
+  "password": "admin123"
+}
+
+### Get Profile (Protected)
+GET {{baseUrl}}/api/auth/profile
+Authorization: Bearer {{token}}
+
+### Change Password (Protected)
+POST {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "admin123",
+  "newPassword": "newpassword123"
+}
+
+### ============================================
+### PROJECTS
+### ============================================
+
+### Get All Projects (Public)
+GET {{baseUrl}}/api/projects
+
+### Get Single Project (Public)
+GET {{baseUrl}}/api/projects/1
+
+### Create Project (Protected)
+POST {{baseUrl}}/api/projects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "E-Commerce Platform",
+  "description": "Full-stack e-commerce platform with React and Node.js",
+  "image_url": "/uploads/ecommerce.jpg",
+  "project_url": "https://ecommerce-demo.com",
+  "github_url": "https://github.com/username/ecommerce",
+  "technologies": ["React", "Node.js", "PostgreSQL", "Stripe"],
+  "category": "Web Development",
+  "featured": true,
+  "order_index": 1
+}
+
+### Update Project (Protected)
+PUT {{baseUrl}}/api/projects/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Updated E-Commerce Platform",
+  "featured": false
+}
+
+### Delete Project (Protected)
+DELETE {{baseUrl}}/api/projects/1
+Authorization: Bearer {{token}}
+
+### ============================================
+### EXPERIENCES
+### ============================================
+
+### Get All Experiences (Public)
+GET {{baseUrl}}/api/experiences
+
+### Get Single Experience (Public)
+GET {{baseUrl}}/api/experiences/1
+
+### Create Experience (Protected)
+POST {{baseUrl}}/api/experiences
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "company": "Tech Company Inc",
+  "position": "Senior Full Stack Developer",
+  "description": "Led development of multiple web applications using React and Node.js",
+  "start_date": "2022-01-01",
+  "end_date": "2024-01-01",
+  "is_current": false,
+  "location": "Jakarta, Indonesia",
+  "order_index": 1
+}
+
+### Update Experience (Protected)
+PUT {{baseUrl}}/api/experiences/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "is_current": true,
+  "end_date": null
+}
+
+### Delete Experience (Protected)
+DELETE {{baseUrl}}/api/experiences/1
+Authorization: Bearer {{token}}
+
+### ============================================
+### ABOUT
+### ============================================
+
+### Get About Info (Public)
+GET {{baseUrl}}/api/about
+
+### Update About (Protected)
+PUT {{baseUrl}}/api/about
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Creative Full Stack Developer",
+  "bio": "Passionate developer with 5+ years of experience building modern web applications. Specialized in React, Node.js, and cloud technologies.",
+  "profile_image": "/uploads/profile.jpg",
+  "resume_url": "/uploads/resume.pdf",
+  "skills": [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "Express",
+    "PostgreSQL",
+    "MongoDB",
+    "AWS",
+    "Docker",
+    "Git"
+  ]
+}
+
+### ============================================
+### CONTACT
+### ============================================
+
+### Get Contact Info (Public)
+GET {{baseUrl}}/api/contact
+
+### Update Contact (Protected)
+PUT {{baseUrl}}/api/contact
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "hello@portfolio.com",
+  "phone": "+62 812 3456 7890",
+  "location": "Jakarta, Indonesia",
+  "linkedin_url": "https://linkedin.com/in/yourprofile",
+  "github_url": "https://github.com/yourusername",
+  "twitter_url": "https://twitter.com/yourhandle"
+}
+
+### ============================================
+### UPLOAD
+### ============================================
+
+### Upload Image (Protected)
+### Note: Use Postman or form-data for file upload
+POST {{baseUrl}}/api/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+# In Postman:
+# - Select Body → form-data
+# - Key: image (type: File)
+# - Value: Select your image file

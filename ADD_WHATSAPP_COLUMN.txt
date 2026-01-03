@@ -1,0 +1,7 @@
+INSTRUKSI: Tambahkan kolom whatsapp_url ke tabel contact
+
+Buka pgAdmin atau DBeaver, lalu jalankan query berikut:
+
+ALTER TABLE contact ADD COLUMN whatsapp_url VARCHAR(255);
+
+Setelah berhasil, coba save WhatsApp URL lagi di Admin Contact.
