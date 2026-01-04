@@ -1,0 +1,17 @@
+-- Fix about_info table schema to match frontend
+-- Run this on VPS database
+
+-- Drop old table
+DROP TABLE IF EXISTS about_info CASCADE;
+
+-- Create new table with correct columns
+CREATE TABLE about_info (
+  id SERIAL PRIMARY KEY,
+  title TEXT,
+  bio TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default data
+INSERT INTO about_info (title, bio) VALUES ('', '');
