@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -16,6 +15,7 @@ import {
   MessageSquare,
   Award,
   BarChart3,
+  Code2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,7 @@ const menuItems: MenuItem[] = [
   { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
   { icon: Home, label: "Home", href: "/admin/home" },
   { icon: UserCircle, label: "About", href: "/admin/about" },
+  { icon: Code2, label: "Skills", href: "/admin/skills" },
   { icon: Clock, label: "Experience", href: "/admin/experience" },
   { icon: Award, label: "Certifications", href: "/admin/certifications" },
   { icon: Folder, label: "Projects", href: "/admin/projects" },

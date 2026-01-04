@@ -10,12 +10,14 @@ interface HeroSectionProps {
 }
 
 interface AboutData {
+  name: string;
   title: string;
   bio: string;
   headline: string;
   profile_image: string;
   resume_url: string;
   skills: string[];
+  availability_status: string;
 }
 
 interface ContactData {
@@ -314,7 +316,7 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                     {/* Name */}
                     <div className="text-center space-y-1.5">
                       <h3 className="text-xl md:text-2xl font-heading font-bold text-foreground tracking-tight">
-                        {about?.title || 'Your Name'}
+                        {about?.name || 'Your Name'}
                       </h3>
                       <p className="text-sm md:text-base font-medium text-gradient">
                         {about?.title || 'UI/UX Designer & Developer'}
@@ -344,7 +346,7 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                     <div className="pt-2 flex justify-center">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        Available for work
+                        {about?.availability_status || 'Available for work'}
                       </div>
                     </div>
                   </div>

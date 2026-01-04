@@ -19,7 +19,7 @@ export const getAbout = async (req, res) => {
 // Update about info
 export const updateAbout = async (req, res) => {
   try {
-    const { title, bio, headline, profile_image, resume_url, skills } = req.body;
+    const { name, title, bio, headline, profile_image, resume_url, skills, availability_status } = req.body;
 
     // Check if about record exists
     const checkResult = await pool.query('SELECT id FROM about LIMIT 1');
@@ -28,26 +28,28 @@ export const updateAbout = async (req, res) => {
     if (checkResult.rows.length === 0) {
       // Create new record
       result = await pool.query(
-        `INSERT INTO about (title, bio, headline, profile_image, resume_url, skills)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO about (name, title, bio, headline, profile_image, resume_url, skills, availability_status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [title, bio, headline, profile_image, resume_url, skills]
+        [name, title, bio, headline, profile_image, resume_url, skills, availability_status || 'Available for work']
       );
     } else {
       // Update existing record
       const id = checkResult.rows[0].id;
       result = await pool.query(
         `UPDATE about 
-         SET title = $1,
-             bio = $2,
-             headline = $3,
-             profile_image = $4,
-             resume_url = $5,
-             skills = $6,
+         SET name = $1,
+             title = $2,
+             bio = $3,
+             headline = $4,
+             profile_image = $5,
+             resume_url = $6,
+             skills = $7,
+             availability_status = $8,
              updated_at = CURRENT_TIMESTAMP
-         WHERE id = $7
+         WHERE id = $9
          RETURNING *`,
-        [title || '', bio || '', headline || '', profile_image || '', resume_url || '', skills || [], id]
+        [name || '', title || '', bio || '', headline || '', profile_image || '', resume_url || '', skills || [], availability_status || 'Available for work', id]
       );
     }
 

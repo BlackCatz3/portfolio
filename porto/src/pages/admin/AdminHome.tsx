@@ -15,12 +15,14 @@ export const AdminHome = () => {
   const [uploading, setUploading] = useState(false);
 
   const [homeData, setHomeData] = useState({
+    name: "",
     title: "",
     headline: "",
     bio: "",
     profile_image: "",
     resume_url: "",
     skills: [] as string[],
+    availability_status: "",
   });
 
   const [skillInput, setSkillInput] = useState("");
@@ -33,12 +35,14 @@ export const AdminHome = () => {
     try {
       const response = await aboutAPI.get();
       setHomeData({
+        name: response.data.name || "",
         title: response.data.title || "",
         headline: response.data.headline || "",
         bio: response.data.bio || "",
         profile_image: response.data.profile_image || "",
         resume_url: response.data.resume_url || "",
         skills: response.data.skills || [],
+        availability_status: response.data.availability_status || "Available for work",
       });
     } catch (error) {
       toast.error("Failed to fetch data");
@@ -137,6 +141,21 @@ export const AdminHome = () => {
           >
             <form onSubmit={handleSave} className="space-y-6">
               <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={homeData.name}
+                  onChange={(e) =>
+                    setHomeData({ ...homeData, name: e.target.value })
+                  }
+                  placeholder="e.g., John Doe, Jane Smith"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Your full name displayed in nametag card
+                </p>
+              </div>
+
+              <div>
                 <Label htmlFor="title">Title / Role</Label>
                 <Input
                   id="title"
@@ -231,6 +250,21 @@ export const AdminHome = () => {
                 )}
               </div>
 
+              <div>
+                <Label htmlFor="availability_status">Availability Status</Label>
+                <Input
+                  id="availability_status"
+                  value={homeData.availability_status}
+                  onChange={(e) =>
+                    setHomeData({ ...homeData, availability_status: e.target.value })
+                  }
+                  placeholder="e.g., Available for work, Open to opportunities"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Status text displayed below photo in nametag card
+                </p>
+              </div>
+
               <Button type="submit" disabled={saving || uploading}>
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? "Saving..." : "Save Content"}
@@ -314,6 +348,7 @@ export const AdminHome = () => {
           <li>• <strong>Headline</strong> - Large text in center</li>
           <li>• <strong>Bio</strong> - Description below headline</li>
           <li>• <strong>Skills</strong> - Badge pills in nametag card (max 3)</li>
+          <li>• <strong>Availability Status</strong> - Status text below photo</li>
           <li>• <strong>Profile Image</strong> - Photo in nametag card</li>
           <li>• <strong>Resume URL</strong> - Download CV button</li>
         </ul>

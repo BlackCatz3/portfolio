@@ -1,0 +1,51 @@
+# Tambah Field NAME ke Table ABOUT
+
+## Masalah
+Di nametag card, ada 2 teks yang sama "QA Enggineer":
+- Yang pertama seharusnya NAMA (misal: "John Doe")
+- Yang kedua adalah ROLE/TITLE (misal: "QA Engineer")
+
+Saat ini database hanya punya field `title` (role), tidak ada field `name`.
+
+## Solusi
+Tambah kolom `name` ke table `about`
+
+## SQL Command
+Jalankan di VPS:
+
+```sql
+-- Connect ke database
+docker exec -it portfolio-db psql -U portfolio_user -d portfolio_cms_2026
+
+-- Tambah kolom name
+ALTER TABLE about ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+
+-- Set default value (opsional)
+UPDATE about SET name = 'Your Name' WHERE name IS NULL;
+
+-- Verify
+SELECT id, name, title, headline FROM about;
+
+-- Exit
+\q
+```
+
+## Update yang Diperlukan
+
+### 1. Backend Controller (backend/src/controllers/aboutController.js)
+Tambahkan `name` ke field yang di-handle
+
+### 2. Frontend Admin (porto/src/pages/admin/AdminHome.tsx)
+Tambahkan input field untuk Name
+
+### 3. Frontend Display (porto/src/components/portfolio/HeroSection.tsx)
+Ubah baris 267 dari:
+```tsx
+{about?.title || 'Your Name'}
+```
+Menjadi:
+```tsx
+{about?.name || 'Your Name'}
+```
+
+Baris 270 tetap pakai `title` (role).

@@ -1,0 +1,40 @@
+# Menambahkan Availability Status ke Admin
+
+## 1. Update Database - Tambah Kolom availability_status
+
+Jalankan SQL ini di VPS:
+
+```sql
+-- Connect ke database
+docker exec -it portfolio-db psql -U portfolio_user -d portfolio_cms_2026
+
+-- Tambah kolom availability_status ke tabel about
+ALTER TABLE about ADD COLUMN IF NOT EXISTS availability_status VARCHAR(100) DEFAULT 'Available for work';
+
+-- Cek hasilnya
+\d about
+
+-- Keluar
+\q
+```
+
+## 2. Restart Backend
+
+```bash
+cd /root/n8n-production/portfolio
+docker-compose restart backend
+```
+
+## 3. Test di Admin
+
+1. Buka https://4leafclover.id/admin/home
+2. Akan ada field baru "Availability Status"
+3. Ubah status sesuai keinginan (contoh: "Available for work", "Open to opportunities", "Currently unavailable")
+4. Save
+5. Cek di homepage - status akan berubah di nametag card
+
+## Catatan
+
+- Status akan muncul di bawah skills badges di nametag card
+- Jika kosong, default akan tampil "Available for work"
+- Bisa diubah kapan saja dari admin panel

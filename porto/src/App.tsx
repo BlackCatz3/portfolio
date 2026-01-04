@@ -11,7 +11,6 @@ import AdminLayout from "./pages/AdminLayout";
 import AdminIndex from "./pages/AdminIndex";
 import AdminProjects from "./pages/admin/AdminProjects";
 import AdminExperiences from "./pages/admin/AdminExperiences";
-import AdminProfile from "./pages/admin/AdminProfile";
 import AdminContact from "./pages/admin/AdminContact";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminMessages from "./pages/admin/AdminMessages";
@@ -21,7 +20,6 @@ import AdminTestimonials from "./pages/admin/AdminTestimonials";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import AdminSocialLinks from "./pages/admin/AdminSocialLinks";
 import AdminCV from "./pages/admin/AdminCV";
-import AdminAboutInfo from "./pages/admin/AdminAboutInfo";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminAbout from "./pages/admin/AdminAbout";
 import AdminCertifications from "./pages/admin/AdminCertifications";
@@ -46,6 +44,7 @@ const App = () => (
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="home" element={<AdminHome />} />
             <Route path="about" element={<AdminAbout />} />
+            <Route path="skills" element={<AdminSkills />} />
             <Route path="experience" element={<AdminExperiences />} />
             <Route path="certifications" element={<AdminCertifications />} />
             <Route path="projects" element={<AdminProjects />} />
@@ -58,7 +57,6 @@ const App = () => (
             <Route path="profile" element={<AdminHome />} />
             <Route path="timeline" element={<AdminExperiences />} />
             <Route path="about-info" element={<AdminAbout />} />
-            <Route path="skills" element={<AdminAbout />} />
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="messages" element={<AdminMessages />} />
             <Route path="social-links" element={<AdminSocialLinks />} />
