@@ -1,0 +1,171 @@
+📧 CARA MENGATUR RATE LIMIT EMAIL
+===================================
+
+FITUR BARU: Rate Limiting Berbasis Email ✨
+-------------------------------------------
+
+Sekarang kamu bisa mengatur berapa kali seseorang boleh mengirim pesan
+dari email yang sama dalam jangka waktu tertentu!
+
+LANGKAH-LANGKAH:
+================
+
+1️⃣ LOGIN KE ADMIN
+   - Buka: https://4leafclover.id/admin/login
+   - Masukkan email & password admin
+
+2️⃣ BUKA MENU SETTINGS
+   - Klik "Settings" di sidebar kiri
+   - Pilih tab "Rate Limiting"
+
+3️⃣ ATUR SETTINGAN
+   
+   A. ENABLE/DISABLE
+      - Toggle switch hijau = AKTIF
+      - Toggle switch abu-abu = NONAKTIF
+   
+   B. MAX MESSAGES PER EMAIL
+      - Isi angka 1-100
+      - Contoh: 3 = maksimal 3 pesan
+   
+   C. TIME WINDOW (MINUTES)
+      - Isi angka 1-1440 (1 hari = 1440 menit)
+      - Contoh: 60 = dalam 60 menit (1 jam)
+
+4️⃣ KLIK "SAVE SETTINGS"
+   - Tunggu notifikasi sukses
+   - Setting langsung aktif!
+
+REKOMENDASI SETTING:
+====================
+
+🔒 KETAT (Recommended untuk anti-spam):
+   - Max Messages: 3
+   - Time Window: 60 menit
+   - Artinya: 1 email hanya bisa kirim 3 pesan per jam
+
+⚖️ SEDANG (Balance antara keamanan & kenyamanan):
+   - Max Messages: 5
+   - Time Window: 120 menit
+   - Artinya: 1 email bisa kirim 5 pesan per 2 jam
+
+🔓 LONGGAR (Untuk testing atau traffic tinggi):
+   - Max Messages: 10
+   - Time Window: 240 menit
+   - Artinya: 1 email bisa kirim 10 pesan per 4 jam
+
+CONTOH PENGGUNAAN:
+==================
+
+Setting: 3 messages per 60 minutes
+
+Jam 10:00 - User kirim pesan 1 ✅
+Jam 10:15 - User kirim pesan 2 ✅
+Jam 10:30 - User kirim pesan 3 ✅
+Jam 10:45 - User kirim pesan 4 ❌ DITOLAK!
+
+Pesan error: "Too many messages from this email. Please try again later."
+
+Jam 11:01 - Counter reset, user bisa kirim lagi ✅
+
+CARA KERJA:
+===========
+
+1. User isi form contact dengan email: user@example.com
+2. User klik Send (setelah centang reCAPTCHA)
+3. System cek database:
+   - Berapa kali user@example.com sudah kirim pesan?
+   - Kapan pesan pertama dikirim?
+4. Jika belum mencapai limit:
+   ✅ Pesan diterima
+   ✅ Counter bertambah
+5. Jika sudah mencapai limit:
+   ❌ Pesan ditolak
+   ❌ User harus tunggu sampai time window habis
+
+PROTEKSI BERLAPIS:
+==================
+
+Sekarang portfolio kamu punya 3 lapis proteksi spam:
+
+1. 🧩 reCAPTCHA v2 Checkbox
+   - Puzzle harus diselesaikan
+   - Blokir bot otomatis
+
+2. 🌐 IP-based Rate Limiting
+   - 1 IP address = max 3 pesan per 15 menit
+   - Blokir spam dari 1 komputer
+
+3. 📧 Email-based Rate Limiting (BARU!)
+   - 1 email = max X pesan per Y menit (bisa diatur)
+   - Blokir spam dari 1 email meski ganti IP/device
+
+MONITORING:
+===========
+
+Kamu bisa cek siapa aja yang kena rate limit:
+
+1. SSH ke VPS:
+   ssh root@43.228.213.128
+
+2. Masuk ke database:
+   docker exec -it portfolio-db psql -U portfolio_user -d portfolio_cms_2026
+
+3. Lihat data:
+   SELECT * FROM email_rate_limits ORDER BY last_message_at DESC LIMIT 10;
+
+4. Lihat setting:
+   SELECT * FROM rate_limit_settings;
+
+RESET MANUAL:
+=============
+
+Jika ada user yang kena rate limit tapi kamu mau kasih akses lagi:
+
+1. Cari email user di database
+2. Hapus record-nya:
+   DELETE FROM email_rate_limits WHERE email = 'user@example.com';
+
+Atau via API (coming soon di admin UI):
+DELETE /api/rate-limit-settings/email/user@example.com
+
+CLEANUP OTOMATIS:
+=================
+
+System otomatis hapus data rate limit yang lebih dari 7 hari.
+Jadi database tidak akan penuh dengan data lama.
+
+TROUBLESHOOTING:
+================
+
+❓ Setting tidak tersimpan?
+   - Cek koneksi internet
+   - Refresh halaman dan coba lagi
+   - Cek console browser (F12) untuk error
+
+❓ Rate limit tidak bekerja?
+   - Pastikan toggle "Enable" dalam posisi ON
+   - Cek apakah backend running: https://api.4leafclover.id/health
+   - Cek database table: rate_limit_settings
+
+❓ User komplain tidak bisa kirim pesan?
+   - Cek apakah mereka sudah mencapai limit
+   - Pertimbangkan naikkan limit atau time window
+   - Atau reset manual rate limit untuk email mereka
+
+TIPS:
+=====
+
+💡 Mulai dengan setting ketat (3/60), lalu adjust sesuai kebutuhan
+💡 Monitor berapa banyak user yang kena rate limit
+💡 Jika banyak user legitimate kena limit, naikkan angkanya
+💡 Jika masih banyak spam, turunkan angkanya
+💡 Time window yang lebih panjang = lebih ketat
+
+SELESAI! 🎉
+===========
+
+Fitur email rate limiting sudah aktif dan bisa diatur dari admin panel.
+Tunggu Netlify deploy selesai (2-3 menit), lalu coba buka admin settings!
+
+Ada pertanyaan? Tanya aja! 😊
