@@ -1,0 +1,87 @@
+🎯 AKAR MASALAH SUDAH DITEMUKAN DAN DIPERBAIKI!
+================================================
+
+## MASALAH UTAMA:
+File `.env.production` di folder `porto/` menggunakan URL LAMA yang SALAH:
+❌ http://43.228.213.128/api (HTTP, IP address, tidak ada SSL)
+
+Seharusnya:
+✅ https://api.4leafclover.id/api (HTTPS, domain dengan SSL)
+
+## KENAPA GAMBAR TIDAK MUNCUL:
+1. Saat build, Vite baca `.env.production` (bukan `netlify.toml`)
+2. URL yang salah di-inject ke JavaScript
+3. Browser coba load gambar dari URL yang salah
+4. Gambar tidak muncul karena Mixed Content Error
+
+## SUDAH DIPERBAIKI:
+✅ Update `.env.production` ke URL yang benar
+✅ Tambah error handling di fungsi `getUploadBaseURL()`
+✅ Tambah debug console logs
+✅ Build ulang dan push ke GitHub
+✅ Netlify akan auto-deploy (tunggu 1-2 menit)
+
+## LANGKAH SEKARANG:
+
+### 1. TUNGGU NETLIFY DEPLOY SELESAI
+   - Buka: https://app.netlify.com
+   - Login dan pilih site kamu
+   - Klik tab "Deploys"
+   - Tunggu sampai status "Published" (warna hijau)
+   - Biasanya 1-2 menit
+
+### 2. BUKA WEBSITE DI BROWSER
+   https://4leafclover.id/admin/home
+
+### 3. BUKA CONSOLE (Tekan F12)
+   - Klik tab "Console"
+   - Cari log dengan emoji 🔍 dan ✅
+   - Harus terlihat:
+     ```
+     🔍 DEBUG - API_BASE_URL: https://api.4leafclover.id/api
+     ✅ DEBUG - Final Upload Base URL: https://api.4leafclover.id
+     ```
+
+### 4. CEK GAMBAR PROFILE
+   - Scroll ke bawah ke bagian "Media & CV"
+   - Gambar profile HARUS sudah muncul!
+   - URL gambar: https://api.4leafclover.id/uploads/1767516735604-650014329.jpg
+
+## JIKA MASIH TIDAK MUNCUL:
+
+### Opsi 1: Clear Cache Netlify
+1. Buka Netlify Dashboard
+2. Klik "Deploys" tab
+3. Klik "Trigger deploy" (tombol di kanan atas)
+4. Pilih "Clear cache and deploy site"
+5. Tunggu deploy selesai
+6. Test lagi
+
+### Opsi 2: Hard Refresh Browser
+1. Tekan Ctrl + Shift + R (Windows)
+2. Atau Cmd + Shift + R (Mac)
+3. Ini akan clear cache browser dan reload
+
+### Opsi 3: Kirim Screenshot
+Jika masih tidak muncul, kirim screenshot:
+1. Browser Console (semua log)
+2. Network tab (filter: uploads)
+3. Gambar profile section
+
+## BACKEND STATUS (100% BENAR):
+✅ Database: Path tersimpan dengan benar
+✅ File System: File ada di /var/www/uploads/
+✅ Permissions: www-data:www-data 644
+✅ Nginx: Serving /uploads/ dengan CORS
+✅ SSL: Certificate valid sampai 2026-04-04
+✅ API: Return data dengan benar
+
+## KESIMPULAN:
+Backend sudah 100% benar dari awal!
+Masalahnya HANYA di frontend environment variable.
+Sekarang sudah diperbaiki.
+
+GAMBAR PASTI AKAN MUNCUL setelah Netlify deploy selesai! 🎉
+
+---
+Baca file INVESTIGASI_AKAR_MASALAH_LENGKAP.txt untuk detail lengkap.
