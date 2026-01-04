@@ -35,10 +35,10 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  login: (email, password) => api.post('/auth-login', { email, password }),
-  getProfile: () => api.get('/auth-profile'),
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  getProfile: () => api.get('/auth/profile'),
   changePassword: (currentPassword, newPassword) => 
-    api.post('/auth-change-password', { currentPassword, newPassword }),
+    api.post('/auth/change-password', { currentPassword, newPassword }),
 };
 
 // Projects API
@@ -79,12 +79,12 @@ export const contactAPI = {
 
 // Blog API
 export const blogAPI = {
-  getAll: (params) => api.get('/blog-posts', { params }),
-  getOne: (id) => api.get(`/blog-posts/${id}`),
-  getBySlug: (slug) => api.get(`/blog-posts/slug/${slug}`),
-  create: (data) => api.post('/blog-posts', data),
-  update: (id, data) => api.put(`/blog-posts/${id}`, data),
-  delete: (id) => api.delete(`/blog-posts/${id}`),
+  getAll: (params) => api.get('/blog/posts', { params }),
+  getOne: (id) => api.get(`/blog/posts/${id}`),
+  getBySlug: (slug) => api.get(`/blog/posts/slug/${slug}`),
+  create: (data) => api.post('/blog/posts', data),
+  update: (id, data) => api.put(`/blog/posts/${id}`, data),
+  delete: (id) => api.delete(`/blog/posts/${id}`),
 };
 
 // Testimonials API
@@ -98,10 +98,10 @@ export const testimonialsAPI = {
 
 // Newsletter API
 export const newsletterAPI = {
-  getSubscribers: () => api.get('/newsletter-subscribers'),
-  subscribe: (data) => api.post('/newsletter-subscribe', data),
-  unsubscribe: (email) => api.post(`/newsletter-unsubscribe/${email}`),
-  deleteSubscriber: (id) => api.delete(`/newsletter-subscribers/${id}`),
+  getSubscribers: () => api.get('/newsletter/subscribers'),
+  subscribe: (data) => api.post('/newsletter/subscribe', data),
+  unsubscribe: (email) => api.post(`/newsletter/unsubscribe/${email}`),
+  deleteSubscriber: (id) => api.delete(`/newsletter/subscribers/${id}`),
 };
 
 // Skills API
@@ -144,10 +144,10 @@ export const uploadAPI = {
 
 // Analytics API
 export const analyticsAPI = {
-  trackEvent: (data) => api.post('/analytics-track', data),
-  getStatistics: () => api.get('/analytics-statistics'),
-  getRecentActivities: (limit = 50) => api.get(`/analytics-activities?limit=${limit}`),
-  getChartData: () => api.get('/analytics-chart'),
+  trackEvent: (data) => api.post('/analytics/track', data),
+  getStatistics: () => api.get('/analytics/statistics'),
+  getRecentActivities: (limit = 50) => api.get(`/analytics/activities?limit=${limit}`),
+  getChartData: () => api.get('/analytics/chart'),
 };
 
 // Helper functions
