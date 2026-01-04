@@ -1,0 +1,67 @@
+# FIX UPLOAD PATH - PRODUCTION
+
+## Masalah Yang Ditemukan:
+- Backend menyimpan file ke `./uploads` (di dalam Docker container)
+- Nginx serve file dari `/var/www/uploads/`
+- File tidak bisa diakses karena lokasi berbeda!
+
+## Solusi Yang Diterapkan:
+Updated `backend/src/middleware/upload.js` untuk menggunakan `/var/www/uploads/` di production.
+
+## Langkah Selanjutnya:
+
+### 1. Commit dan Push Perubahan
+```bash
+cd C:\Users\LENOVO\porto
+git add backend/src/middleware/upload.js
+git commit -m "fix: use /var/www/uploads for production file uploads"
+git push origin main
+```
+
+### 2. Pull dan Restart Backend di VPS
+```bash
+ssh root@43.228.213.128
+
+# Masuk ke direktori backend
+cd /root/backend
+
+# Pull perubahan terbaru
+git pull origin main
+
+# Restart backend container
+docker-compose restart backend
+
+# Cek log untuk memastikan tidak ada error
+docker-compose logs -f backend
+```
+
+### 3. Test Upload Lagi
+1. Buka admin panel: https://4leafclover.id/admin/home
+2. Upload gambar baru
+3. Klik "Save Media"
+4. Refresh halaman
+5. Gambar seharusnya muncul!
+
+## Penjelasan Teknis:
+
+**Sebelum:**
+```javascript
+const uploadsDir = './uploads';  // ❌ Relative path di container
+```
+
+**Sesudah:**
+```javascript
+const uploadsDir = process.env.NODE_ENV === 'production' 
+  ? '/var/www/uploads'   // ✅ Absolute path untuk production
+  : './uploads';         // ✅ Relative path untuk development
+```
+
+**Kenapa ini penting:**
+- Docker container menyimpan file di `/app/uploads/` (tidak accessible oleh Nginx)
+- Nginx hanya bisa serve file dari `/var/www/uploads/`
+- Dengan menggunakan absolute path `/var/www/uploads/`, file langsung tersimpan di lokasi yang benar
+
+## Catatan:
+- File lama yang sudah ter-upload masih ada di `/root/backend/uploads/`
+- File baru akan tersimpan di `/var/www/uploads/`
+- Kamu bisa pindahkan file lama jika perlu (opsional)
