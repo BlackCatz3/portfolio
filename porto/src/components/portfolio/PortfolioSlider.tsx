@@ -144,13 +144,13 @@ export const PortfolioSlider = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ delay: 1 }}
-              className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 md:hidden pointer-events-none"
+              className="fixed bottom-24 left-0 right-0 z-40 md:hidden pointer-events-none px-4"
             >
-              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-5 py-3 rounded-full shadow-lg flex items-center justify-center gap-2 max-w-fit mx-auto">
                 <motion.span
-                  animate={{ x: [-10, 10, -10] }}
+                  animate={{ x: [-8, 8, -8] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="text-2xl"
+                  className="text-xl"
                 >
                   👆
                 </motion.span>
@@ -158,9 +158,9 @@ export const PortfolioSlider = () => {
                   Swipe untuk navigasi
                 </span>
                 <motion.span
-                  animate={{ x: [-10, 10, -10] }}
+                  animate={{ x: [-8, 8, -8] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="text-2xl"
+                  className="text-xl"
                 >
                   👉
                 </motion.span>

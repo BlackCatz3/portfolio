@@ -1,0 +1,118 @@
+===========================================
+MOBILE SWIPE HINT ANIMATION ADDED
+===========================================
+
+MASALAH:
+--------
+Di mobile tidak ada animasi/petunjuk untuk swipe ke kanan/kiri untuk berganti halaman
+
+SOLUSI YANG DITERAPKAN:
+------------------------
+✅ Menambahkan swipe hint animation khusus untuk mobile
+✅ Animasi muncul di bagian bawah layar
+✅ Auto-hide setelah 5 detik
+✅ Hide saat user mulai swipe (first interaction)
+✅ Hanya tampil di mobile (hidden di desktop dengan md:hidden)
+
+FITUR SWIPE HINT:
+-----------------
+1. **Visual Design:**
+   - Badge dengan background primary/90 + backdrop blur
+   - Emoji tangan kiri 👆 dan kanan 👉 dengan animasi bergerak
+   - Text "Swipe untuk navigasi"
+   - Rounded full dengan shadow
+
+2. **Animasi:**
+   - Fade in dari bawah (opacity 0 → 1, y: 20 → 0)
+   - Emoji bergerak kiri-kanan (x: -10 → 10 → -10)
+   - Smooth transition dengan framer-motion
+
+3. **Behavior:**
+   - Muncul 1 detik setelah page load
+   - Auto-hide setelah 5 detik
+   - Hide saat user touch screen (first interaction)
+   - Tidak mengganggu interaksi (pointer-events-none)
+
+4. **Positioning:**
+   - Fixed position di bottom-24 (6rem dari bawah)
+   - Centered horizontal (left-1/2 -translate-x-1/2)
+   - Z-index 40 (di atas content, di bawah navigation)
+
+KODE YANG DITAMBAHKAN:
+-----------------------
+File: porto/src/components/portfolio/PortfolioSlider.tsx
+
+1. State untuk show/hide hint:
+   const [showSwipeHint, setShowSwipeHint] = useState(true);
+
+2. Auto-hide timer (5 detik):
+   useEffect(() => {
+     const timer = setTimeout(() => {
+       setShowSwipeHint(false);
+     }, 5000);
+     return () => clearTimeout(timer);
+   }, []);
+
+3. Hide on first touch:
+   const handleTouchStart = (e: TouchEvent) => {
+     startX = e.touches[0].clientX;
+     startY = e.touches[0].clientY;
+     setShowSwipeHint(false); // ← ADDED
+   };
+
+4. Swipe Hint Component:
+   <AnimatePresence>
+     {showSwipeHint && (
+       <motion.div
+         initial={{ opacity: 0, y: 20 }}
+         animate={{ opacity: 1, y: 0 }}
+         exit={{ opacity: 0, y: 20 }}
+         transition={{ delay: 1 }}
+         className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 md:hidden pointer-events-none"
+       >
+         <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+           <motion.span
+             animate={{ x: [-10, 10, -10] }}
+             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+             className="text-2xl"
+           >
+             👆
+           </motion.span>
+           <span className="text-sm font-medium whitespace-nowrap">
+             Swipe untuk navigasi
+           </span>
+           <motion.span
+             animate={{ x: [-10, 10, -10] }}
+             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+             className="text-2xl"
+           >
+             👉
+           </motion.span>
+         </div>
+       </motion.div>
+     )}
+   </AnimatePresence>
+
+STATUS:
+-------
+✅ Code committed: 979035b
+✅ Pushed to GitHub: main branch
+⏳ Netlify sedang auto-deploy...
+
+CARA TEST:
+----------
+1. Buka https://4leafclover.id di mobile browser
+2. Tunggu 1 detik setelah page load
+3. Akan muncul badge "Swipe untuk navigasi" dengan emoji bergerak
+4. Badge akan hilang setelah:
+   - 5 detik (auto-hide), ATAU
+   - Saat kamu mulai swipe (first touch)
+
+CATATAN:
+--------
+- Hint hanya muncul di mobile (< 768px width)
+- Tidak mengganggu interaksi user (pointer-events-none)
+- Smooth animation dengan framer-motion
+- Konsisten dengan design system (primary color, backdrop blur)
+
+Sekarang user mobile akan tahu bahwa mereka bisa swipe! 🎉
