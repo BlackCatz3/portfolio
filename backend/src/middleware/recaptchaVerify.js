@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Test key as fallback
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6Lem8T8sAAAAAKoXBEUc3u7gZ5i5zFNEm1hYGuQq'; // Production key
 
 export const verifyRecaptcha = async (req, res, next) => {
   try {
