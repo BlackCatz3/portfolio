@@ -31,6 +31,11 @@ services:
     restart: always
     environment:
       NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: portfolio_cms_2026
+      DB_USER: portfolio_user
+      DB_PASSWORD: ${DB_PASSWORD}
       DATABASE_URL: postgresql://portfolio_user:${DB_PASSWORD}@postgres:5432/portfolio_cms_2026
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 7d
