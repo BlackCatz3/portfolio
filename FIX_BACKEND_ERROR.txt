@@ -1,0 +1,158 @@
+=================================================================
+🔧 FIX BACKEND API ERROR (500 Internal Server Error)
+=================================================================
+
+MASALAH:
+- HTTPS berfungsi ✅ (Tidak ada Mixed Content Error)
+- Backend health check berfungsi ✅
+- Tapi API endpoints return 500 error ❌
+
+PENYEBAB KEMUNGKINAN:
+1. Database connection error
+2. Table tidak ada atau schema salah
+3. Environment variables tidak lengkap
+
+
+STEP 1: CEK BACKEND LOGS
+-----------------------------------------------------------------
+ssh root@43.228.213.128
+
+# Cek logs backend
+docker logs backend-app-1 --tail 100
+
+# Cari error message seperti:
+# - "Database connection failed"
+# - "relation does not exist" (table tidak ada)
+# - "column does not exist"
+# - "authentication failed"
+
+
+STEP 2: CEK DATABASE CONNECTION
+-----------------------------------------------------------------
+# Test database connection
+docker exec -it backend-app-1 node src/database/check-admin.js
+
+# Jika error "relation does not exist", table belum dibuat
+
+
+STEP 3: CEK ENVIRONMENT VARIABLES
+-----------------------------------------------------------------
+docker exec -it backend-app-1 env | grep DB
+
+# Pastikan ada:
+# DB_HOST=localhost (atau IP database)
+# DB_PORT=5432
+# DB_NAME=portfolio_cms_2026
+# DB_USER=postgres
+# DB_PASSWORD=<password>
+
+
+STEP 4: CEK DATABASE TABLES
+-----------------------------------------------------------------
+# Login ke database
+docker exec -it postgres-db psql -U postgres -d portfolio_cms_2026
+
+# List semua tables
+\dt
+
+# Harusnya ada tables:
+# - admins
+# - projects
+# - experiences
+# - about
+# - about_info
+# - contact
+# - certifications
+# - skills
+# - testimonials
+# - blog_posts
+# - newsletter_subscribers
+# - messages
+# - analytics
+
+# Keluar dari psql
+\q
+
+
+STEP 5: JIKA TABLE TIDAK ADA - CREATE TABLES
+-----------------------------------------------------------------
+# Jalankan migration script
+docker exec -it backend-app-1 node src/database/migrate-all.js
+
+# Atau manual create tables
+docker exec -it postgres-db psql -U postgres -d portfolio_cms_2026 < /path/to/schema.sql
+
+
+STEP 6: RESTART BACKEND
+-----------------------------------------------------------------
+cd /root/backend
+docker-compose restart
+
+# Cek logs setelah restart
+docker logs backend-app-1 --tail 50
+
+
+STEP 7: TEST API ENDPOINTS
+-----------------------------------------------------------------
+# Test dari VPS
+curl https://api.4leafclover.id/api/projects
+curl https://api.4leafclover.id/api/about
+curl https://api.4leafclover.id/api/experiences
+
+# Harusnya return data atau empty array [], bukan error
+
+
+=================================================================
+📋 QUICK DIAGNOSIS
+=================================================================
+
+Jalankan perintah ini untuk diagnosis cepat:
+
+ssh root@43.228.213.128 << 'EOF'
+echo "=== BACKEND LOGS (Last 20 lines) ==="
+docker logs backend-app-1 --tail 20
+
+echo ""
+echo "=== DATABASE CONNECTION TEST ==="
+docker exec backend-app-1 node src/database/check-admin.js
+
+echo ""
+echo "=== ENVIRONMENT VARIABLES ==="
+docker exec backend-app-1 env | grep DB
+
+echo ""
+echo "=== DATABASE TABLES ==="
+docker exec postgres-db psql -U postgres -d portfolio_cms_2026 -c "\dt"
+EOF
+
+
+=================================================================
+🚨 KEMUNGKINAN BESAR MASALAHNYA
+=================================================================
+
+Berdasarkan error 500 di semua endpoints, kemungkinan besar:
+
+1. **Database tables belum dibuat**
+   - Solution: Jalankan migration script
+   - Command: docker exec -it backend-app-1 node src/database/migrate-all.js
+
+2. **Database connection error**
+   - Solution: Cek environment variables
+   - Command: docker exec -it backend-app-1 env | grep DB
+
+3. **Database container tidak running**
+   - Solution: Start database container
+   - Command: docker-compose up -d postgres-db
+
+
+=================================================================
+💡 CATATAN PENTING
+=================================================================
+
+- Health check endpoint (/health) tidak butuh database, makanya berfungsi
+- API endpoints (/api/projects, /api/about, dll) butuh database
+- Jika database error, semua API endpoints return 500
+
+Kirim hasil logs ke saya agar saya bisa bantu troubleshoot lebih detail!
+
+=================================================================
