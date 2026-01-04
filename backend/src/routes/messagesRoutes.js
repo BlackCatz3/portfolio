@@ -9,11 +9,12 @@ import {
 } from '../controllers/messagesController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { contactFormLimiter } from '../middleware/rateLimiter.js';
+import { verifyRecaptcha } from '../middleware/recaptchaVerify.js';
 
 const router = express.Router();
 
-// Public route with rate limiting and validation
-router.post('/', contactFormLimiter, validateMessage, createMessage);
+// Public route with rate limiting, reCAPTCHA verification, and validation
+router.post('/', contactFormLimiter, verifyRecaptcha, validateMessage, createMessage);
 
 // Protected routes
 router.get('/', authenticateToken, getAllMessages);

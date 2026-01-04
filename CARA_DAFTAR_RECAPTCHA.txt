@@ -1,0 +1,43 @@
+===========================================
+CARA DAFTAR GOOGLE reCAPTCHA
+===========================================
+
+LANGKAH-LANGKAH:
+----------------
+
+1. Buka: https://www.google.com/recaptcha/admin/create
+
+2. Login dengan Google Account kamu
+
+3. Isi form registrasi:
+   - Label: Portfolio 4leafclover (atau nama apapun)
+   - reCAPTCHA type: Pilih "reCAPTCHA v2" → "I'm not a robot" Checkbox
+   - Domains: 
+     * 4leafclover.id
+     * www.4leafclover.id
+     * localhost (untuk testing)
+   - Accept reCAPTCHA Terms of Service: ✓ Centang
+   - Send alerts to owners: ✓ Centang (optional)
+
+4. Klik "Submit"
+
+5. Kamu akan dapat 2 keys:
+   - **Site Key** (untuk frontend) - contoh: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+   - **Secret Key** (untuk backend) - contoh: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+
+6. SIMPAN kedua keys ini!
+
+TESTING KEYS (untuk development):
+----------------------------------
+Google menyediakan test keys yang selalu pass:
+
+Site Key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+Secret Key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+
+Gunakan ini dulu untuk testing, nanti ganti dengan keys production.
+
+NEXT STEPS:
+-----------
+Setelah dapat keys, masukkan ke:
+1. Frontend (.env.production): VITE_RECAPTCHA_SITE_KEY=your_site_key
+2. Backend (environment variable): RECAPTCHA_SECRET_KEY=your_secret_key

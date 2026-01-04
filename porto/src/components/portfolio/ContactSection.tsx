@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, Mail, MapPin, Phone, Github, Linkedin, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { contactAPI, aboutAPI, messagesAPI, getUploadBaseURL } from "@/services/api";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface ContactData {
   email: string;
@@ -35,6 +36,9 @@ export const ContactSection = () => {
   const [contact, setContact] = useState<ContactData | null>(null);
   const [about, setAbout] = useState<AboutData | null>(null);
   const [loading, setLoading] = useState(true);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key as fallback
 
   useEffect(() => {
     const fetchData = async () => {
@@ -160,13 +164,26 @@ export const ContactSection = () => {
       return;
     }
     
+    // Validate reCAPTCHA
+    const recaptchaValue = recaptchaRef.current?.getValue();
+    if (!recaptchaValue) {
+      toast.error("Please complete the reCAPTCHA verification");
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
-      await messagesAPI.create(formData);
+      // Send message with reCAPTCHA token
+      await messagesAPI.create({
+        ...formData,
+        recaptchaToken: recaptchaValue,
+      });
       toast.success("Message sent successfully! I'll get back to you soon.");
       setFormData({ name: "", email: "", message: "" });
       setFormErrors({});
+      // Reset reCAPTCHA
+      recaptchaRef.current?.reset();
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || "Failed to send message. Please try again.";
       
@@ -179,6 +196,8 @@ export const ContactSection = () => {
       } else {
         toast.error(errorMessage);
       }
+      // Reset reCAPTCHA on error
+      recaptchaRef.current?.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -314,6 +333,15 @@ export const ContactSection = () => {
                       {formData.message.length}/5000 characters
                     </p>
                   </div>
+                </div>
+                
+                {/* reCAPTCHA */}
+                <div className="flex justify-center">
+                  <ReCAPTCHA
+                    ref={recaptchaRef}
+                    sitekey={RECAPTCHA_SITE_KEY}
+                    theme="dark"
+                  />
                 </div>
                 
                 <Button
