@@ -1,0 +1,39 @@
+🔄 UPDATE BACKEND DI VPS DENGAN PRODUCTION RECAPTCHA KEY
+================================================
+
+JALANKAN PERINTAH INI DI VPS:
+
+```bash
+# 1. SSH ke VPS
+ssh root@43.228.213.128
+
+# 2. Masuk ke direktori project
+cd /root/n8n-production/portfolio
+
+# 3. Pull code terbaru (commit 1ccff7c)
+git pull origin main
+
+# 4. Restart backend container
+docker-compose restart backend
+
+# 5. Cek logs untuk memastikan tidak ada error
+docker-compose logs -f backend
+```
+
+PERUBAHAN YANG DI-PULL:
+- backend/src/middleware/recaptchaVerify.js: Update dari test key ke production key
+- RECAPTCHA_IMPLEMENTATION_COMPLETE.txt: Dokumentasi implementasi
+- RECAPTCHA_READY_TO_TEST.txt: Panduan testing
+- SET_RECAPTCHA_SECRET_VPS.txt: Panduan set environment variable (optional)
+
+SETELAH RESTART:
+1. Test reCAPTCHA di https://4leafclover.id
+2. Buka Contact section
+3. Isi form dan centang "I'm not a robot"
+4. Klik Send Message
+5. Harus berhasil!
+
+CATATAN:
+- Production Secret Key: 6Lem8T8sAAAAAKoXBEUc3u7gZ5i5zFNEm1hYGuQq
+- Key ini sudah ada di code sebagai fallback
+- Untuk keamanan lebih baik, bisa set via environment variable (lihat SET_RECAPTCHA_SECRET_VPS.txt)
