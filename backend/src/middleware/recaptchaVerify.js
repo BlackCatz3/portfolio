@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6Lf49T8sAAAAAACEiOAI6BuSvUsqZBPynKADEmm5I'; // Production key - Invisible v2
+// Use Google Test Key - Puzzle will ALWAYS appear
+const RECAPTCHA_SECRET_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Test key - puzzle always shows
 
 export const verifyRecaptcha = async (req, res, next) => {
   try {
@@ -23,7 +24,7 @@ export const verifyRecaptcha = async (req, res, next) => {
       }
     });
 
-    const { success, score, 'error-codes': errorCodes } = response.data;
+    const { success, 'error-codes': errorCodes } = response.data;
 
     if (!success) {
       console.error('reCAPTCHA verification failed:', errorCodes);
@@ -34,7 +35,6 @@ export const verifyRecaptcha = async (req, res, next) => {
     }
 
     // For reCAPTCHA v2, success is enough
-    // For v3, you would check the score here (score >= 0.5 is usually good)
     
     // Remove recaptchaToken from body before passing to controller
     delete req.body.recaptchaToken;

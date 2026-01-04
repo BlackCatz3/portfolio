@@ -1,0 +1,84 @@
+⚠️ PERINGATAN PENTING: TEST KEY DI PRODUCTION
+================================================
+
+## 🚨 RISIKO MENGGUNAKAN TEST KEY DI PRODUCTION:
+
+### 1. **Tidak Secure** ❌
+- Test key adalah **public key** yang semua orang tahu
+- Siapa saja bisa pakai test key ini
+- Bot bisa bypass dengan mudah
+
+### 2. **Tidak Ada Proteksi Anti-Spam** ❌
+- Test key **SELALU accept** semua request
+- Bot bisa spam tanpa batas
+- Tidak ada rate limiting dari Google
+
+### 3. **Tidak Recommended oleh Google** ❌
+- Google explicitly bilang: "DO NOT use test keys in production"
+- Melanggar terms of service Google
+
+---
+
+## ✅ ALTERNATIF YANG LEBIH BAIK:
+
+### Option 1: Terima Behavior Google (RECOMMENDED)
+- Biarkan Google yang tentukan kapan puzzle muncul
+- Puzzle akan muncul kalau ada bot/spam
+- UX lebih baik untuk user normal
+
+### Option 2: Daftar reCAPTCHA Enterprise
+- Google reCAPTCHA Enterprise punya kontrol lebih
+- Bisa set security level lebih tinggi
+- Tapi berbayar (setelah free tier)
+
+### Option 3: Gunakan CAPTCHA Alternatif
+- hCaptcha - bisa set difficulty level
+- Cloudflare Turnstile - lebih modern
+- FriendlyCaptcha - privacy-focused
+
+---
+
+## 🤔 PERTANYAAN:
+
+**Kenapa kamu mau puzzle SELALU muncul?**
+
+1. **Untuk demo/presentasi?**
+   → Pakai test key OK (temporary)
+
+2. **Untuk proteksi spam?**
+   → Production key sudah cukup (Google AI detect bot)
+
+3. **Untuk "terlihat secure"?**
+   → Checkbox + badge sudah cukup (user tahu ada proteksi)
+
+4. **Karena tidak percaya Google AI?**
+   → Google AI sangat baik, puzzle akan muncul kalau perlu
+
+---
+
+## 💡 REKOMENDASI SAYA:
+
+**JANGAN pakai test key di production!**
+
+**Sebaiknya:**
+1. ✅ Pakai production key (current)
+2. ✅ Biarkan Google yang tentukan kapan puzzle muncul
+3. ✅ Tambah rate limiting di backend (sudah ada)
+4. ✅ Tambah validation di backend (sudah ada)
+
+**Kombinasi ini sudah sangat secure!**
+
+---
+
+## 🎯 KEPUTUSAN KAMU:
+
+Kalau kamu tetap mau pakai test key di production, saya bisa update sekarang. Tapi kamu harus paham risikonya:
+
+- ❌ Tidak secure
+- ❌ Bot bisa bypass
+- ❌ Tidak ada proteksi spam
+- ❌ Melanggar ToS Google
+
+**Apakah kamu yakin mau lanjut dengan test key?**
+
+Atau mau saya jelaskan cara lain yang lebih secure?

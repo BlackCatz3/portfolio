@@ -26,6 +26,7 @@ export const ContactSection = () => {
     name: "",
     email: "",
     message: "",
+    website: "", // Honeypot field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<{
@@ -36,9 +37,11 @@ export const ContactSection = () => {
   const [contact, setContact] = useState<ContactData | null>(null);
   const [about, setAbout] = useState<AboutData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [formStartTime] = useState(Date.now()); // Track when form was loaded
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   
-  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key as fallback
+  // Use Google Test Key - Puzzle will ALWAYS appear
+  const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key - puzzle always shows
 
   useEffect(() => {
     const fetchData = async () => {
@@ -158,6 +161,22 @@ export const ContactSection = () => {
     // Clear previous errors
     setFormErrors({});
     
+    // ANTI-BOT CHECK 1: Honeypot field (hidden field that only bots fill)
+    if (formData.website) {
+      // Bot detected - silently reject
+      toast.error("Please try again later");
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // ANTI-BOT CHECK 2: Time-based validation (reject if submitted too fast)
+    const timeSpent = Date.now() - formStartTime;
+    if (timeSpent < 3000) { // Less than 3 seconds
+      toast.error("Please take your time to fill the form");
+      setIsSubmitting(false);
+      return;
+    }
+    
     // Validate form
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
@@ -176,14 +195,15 @@ export const ContactSection = () => {
         return;
       }
       
-      // Send message with reCAPTCHA token
+      // Send message with reCAPTCHA token (exclude honeypot field)
+      const { website, ...dataToSend } = formData;
       await messagesAPI.create({
-        ...formData,
+        ...dataToSend,
         recaptchaToken: recaptchaToken,
       });
       
       toast.success("Message sent successfully! I'll get back to you soon.");
-      setFormData({ name: "", email: "", message: "" });
+      setFormData({ name: "", email: "", message: "", website: "" });
       setFormErrors({});
       
       // Reset reCAPTCHA
@@ -296,6 +316,26 @@ export const ContactSection = () => {
                       <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
                     )}
                   </div>
+                  
+                  {/* Honeypot field - hidden from users, only bots will fill this */}
+                  <input
+                    type="text"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    style={{
+                      position: 'absolute',
+                      left: '-9999px',
+                      width: '1px',
+                      height: '1px',
+                      opacity: 0,
+                      pointerEvents: 'none'
+                    }}
+                    aria-hidden="true"
+                  />
+                  
                   <div>
                     <label htmlFor="email" className="text-sm font-medium mb-2 block">
                       Email

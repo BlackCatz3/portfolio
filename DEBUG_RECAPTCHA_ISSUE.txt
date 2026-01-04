@@ -1,0 +1,200 @@
+🐛 DEBUG: RECAPTCHA MASIH TIDAK BEKERJA
+================================================
+
+## 📸 DARI SCREENSHOT:
+
+**Yang Terlihat:**
+- ✅ Form contact bisa diisi
+- ✅ Button "Send Message" ada
+- ✅ Message berhasil terkirim
+- ❌ **TIDAK ADA BADGE reCAPTCHA** di pojok kanan bawah
+- ❌ Message langsung masuk tanpa verifikasi reCAPTCHA
+
+**Kesimpulan:**
+- reCAPTCHA TIDAK LOAD sama sekali
+- Environment variable belum diterapkan di build
+- Netlify masih pakai build lama
+
+---
+
+## 🔍 ROOT CAUSE ANALYSIS:
+
+### Kemungkinan 1: Deploy Belum Selesai ⏳
+- Commit a9ef96c baru di-push
+- Netlify butuh 3-4 menit untuk build
+- Kamu test terlalu cepat (belum 4 menit)
+
+### Kemungkinan 2: Environment Variable Belum Diterapkan ❌
+- Env var sudah diset di Netlify dashboard
+- Tapi Netlify perlu **REDEPLOY** setelah env var diset
+- Build yang sekarang masih pakai env var lama (atau tidak ada)
+
+### Kemungkinan 3: Netlify Tidak Auto-Deploy 🤔
+- Mungkin auto-deploy disabled
+- Atau webhook tidak trigger
+
+---
+
+## ✅ SOLUSI PASTI:
+
+Saya akan cek status deploy dan pastikan environment variable diterapkan dengan benar.
+
+**Langkah yang akan saya lakukan:**
+1. Cek apakah deploy sudah selesai
+2. Kalau belum, tunggu sampai selesai
+3. Kalau sudah selesai tapi masih tidak ada badge, berarti env var belum diterapkan
+4. Solusi: Trigger manual redeploy di Netlify
+
+---
+
+## 🎯 YANG HARUS KAMU LAKUKAN SEKARANG:
+
+### STEP 1: Cek Status Deploy di Netlify
+
+1. Buka: https://app.netlify.com
+2. Pilih site: **4leafclover.id**
+3. Klik tab **"Deploys"**
+4. Lihat deploy terbaru (commit a9ef96c)
+5. Cek statusnya:
+
+**Kalau status "Building..." atau "Deploying...":**
+- ⏳ Deploy masih berjalan
+- Tunggu sampai status "Published"
+- Jangan test dulu
+
+**Kalau status "Published" ✅:**
+- Deploy sudah selesai
+- Tapi reCAPTCHA masih tidak bekerja
+- Berarti env var belum diterapkan
+- Lanjut ke STEP 2
+
+**Kalau status "Failed" ❌:**
+- Deploy gagal
+- Klik deploy tersebut
+- Lihat error log
+- Screenshot dan tunjukkan ke saya
+
+---
+
+### STEP 2: Trigger Manual Redeploy (PENTING!)
+
+**Kalau deploy sudah "Published" tapi reCAPTCHA masih tidak bekerja:**
+
+1. Di halaman Deploys, klik button **"Trigger deploy"** (kanan atas)
+2. Pilih **"Clear cache and deploy site"**
+3. Tunggu sampai deploy selesai (3-4 menit)
+4. Setelah status "Published", test lagi
+
+**Kenapa perlu manual redeploy?**
+- Environment variable baru diset SETELAH build terakhir
+- Netlify perlu rebuild dengan env var baru
+- Auto-deploy dari commit a9ef96c mungkin masih pakai env var lama
+
+---
+
+### STEP 3: Test Lagi Setelah Redeploy
+
+1. Tunggu sampai deploy status "Published"
+2. Buka: https://4leafclover.id
+3. **Hard refresh:** CTRL + F5 (penting!)
+4. Scroll ke Contact section
+5. **Cek pojok kanan bawah** → harus ada badge "reCAPTCHA"
+6. Test form contact
+
+---
+
+## 🔧 ALTERNATIVE: CEK ENV VAR DI BROWSER CONSOLE
+
+Setelah deploy selesai, cek apakah env var sudah diterapkan:
+
+1. Buka: https://4leafclover.id
+2. Tekan **F12** (Developer Tools)
+3. Ketik di Console:
+   ```javascript
+   import.meta.env.VITE_RECAPTCHA_SITE_KEY
+   ```
+4. Lihat hasilnya:
+
+**Kalau hasilnya:**
+- `"6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5"` ✅ → Env var berhasil!
+- `"6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"` ❌ → Test key (env var belum diterapkan)
+- `undefined` ❌ → Env var tidak ada
+
+**Kalau masih test key atau undefined:**
+- Env var belum diterapkan di build
+- Perlu trigger manual redeploy
+
+---
+
+## 📊 DIAGNOSIS FLOW:
+
+```
+Cek Status Deploy
+      ↓
+┌─────┴─────┐
+│           │
+Building    Published
+│           │
+Tunggu      Cek Badge
+│           │
+│     ┌─────┴─────┐
+│     │           │
+│   Ada Badge   Tidak Ada
+│     │           │
+│   Test Form   Cek Console
+│     │           │
+│   ✅ DONE    Env Var?
+│              │
+│        ┌─────┴─────┐
+│        │           │
+│    Production   Test Key
+│        │           │
+│      ✅ DONE    Trigger
+│              Manual Redeploy
+│                    │
+└────────────────────┘
+```
+
+---
+
+## 🎯 KESIMPULAN:
+
+**Masalah Sekarang:**
+- ❌ reCAPTCHA tidak load
+- ❌ Tidak ada badge
+- ❌ Message langsung masuk tanpa verifikasi
+
+**Root Cause:**
+- Deploy belum selesai ATAU
+- Environment variable belum diterapkan di build
+
+**Solusi:**
+1. Cek status deploy di Netlify
+2. Kalau sudah "Published" tapi masih tidak ada badge:
+   - Trigger manual redeploy
+   - Tunggu sampai selesai
+   - Test lagi dengan hard refresh
+
+**Estimated Time:**
+- Cek status: 1 menit
+- Manual redeploy: 3-4 menit
+- Test: 2 menit
+- **Total:** 6-7 menit
+
+---
+
+## 📞 NEXT STEPS:
+
+**Tolong lakukan ini:**
+1. Buka Netlify dashboard
+2. Cek status deploy (commit a9ef96c)
+3. Screenshot status deploy
+4. Tunjukkan ke saya
+
+**Atau kalau deploy sudah "Published":**
+1. Trigger manual redeploy
+2. Tunggu sampai selesai
+3. Test lagi
+4. Screenshot hasilnya
+
+Saya tunggu update dari kamu! 🚀
