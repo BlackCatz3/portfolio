@@ -19,7 +19,7 @@ export const getAboutInfo = async (req, res) => {
 // Update about info (for About Section)
 export const updateAboutInfo = async (req, res) => {
   try {
-    const { title, bio } = req.body;
+    const { content, image_url } = req.body;
 
     // Check if about_info record exists
     const checkResult = await pool.query('SELECT id FROM about_info LIMIT 1');
@@ -28,22 +28,22 @@ export const updateAboutInfo = async (req, res) => {
     if (checkResult.rows.length === 0) {
       // Create new record
       result = await pool.query(
-        `INSERT INTO about_info (title, bio)
+        `INSERT INTO about_info (content, image_url)
          VALUES ($1, $2)
          RETURNING *`,
-        [title, bio]
+        [content, image_url]
       );
     } else {
       // Update existing record
       const id = checkResult.rows[0].id;
       result = await pool.query(
         `UPDATE about_info 
-         SET title = $1,
-             bio = $2,
+         SET content = $1,
+             image_url = $2,
              updated_at = CURRENT_TIMESTAMP
          WHERE id = $3
          RETURNING *`,
-        [title || '', bio || '', id]
+        [content || '', image_url || '', id]
       );
     }
 
