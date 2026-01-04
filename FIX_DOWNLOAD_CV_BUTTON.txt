@@ -1,0 +1,67 @@
+✅ FIX DOWNLOAD CV BUTTON - SOLVED!
+===================================
+
+## MASALAH:
+Ketika klik tombol "Download CV", URL yang dihasilkan salah:
+❌ api.4leafclover.idhttps://drive.google.com/file/d/1Q0ia3vgMz4TxIdzdO4osGKanLM63c1id/view
+
+URL ini adalah gabungan dari:
+- Base URL: `https://api.4leafclover.id`
+- Resume URL dari database: `https://drive.google.com/file/d/1Q0ia3vgMz4TxIdzdO4osGKanLM63c1id/view`
+
+## PENYEBAB:
+Kode di `HeroSection.tsx` menggunakan:
+```tsx
+<a href={`${getUploadBaseURL()}${about.resume_url}`}>
+```
+
+Ini berasumsi bahwa `resume_url` selalu berupa path relatif seperti `/uploads/cv.pdf`.
+Tapi di database, `resume_url` berisi URL Google Drive lengkap!
+
+## SOLUSI:
+Update kode untuk mendeteksi apakah `resume_url` sudah URL lengkap atau path relatif:
+
+```tsx
+<a 
+  href={
+    about.resume_url.startsWith('http://') || about.resume_url.startsWith('https://') 
+      ? about.resume_url 
+      : `${getUploadBaseURL()}${about.resume_url}`
+  } 
+  target="_blank" 
+  rel="noopener noreferrer"
+>
+```
+
+Logika:
+- Jika `resume_url` dimulai dengan `http://` atau `https://` → Gunakan langsung (URL eksternal)
+- Jika tidak → Gabungkan dengan base URL (file lokal di server)
+
+## HASIL:
+✅ URL Google Drive: Langsung ke Google Drive
+✅ URL lokal (/uploads/cv.pdf): Ke https://api.4leafclover.id/uploads/cv.pdf
+
+## CARA KERJA:
+1. User klik "Download CV"
+2. Kode cek apakah `resume_url` adalah URL lengkap
+3. Jika ya → Buka URL tersebut langsung
+4. Jika tidak → Gabungkan dengan base URL server
+
+## DEPLOYMENT:
+✅ Code updated di `porto/src/components/portfolio/HeroSection.tsx`
+✅ Build completed
+✅ Pushed to GitHub (commit: 96b921c)
+✅ Netlify akan auto-deploy dalam 1-2 menit
+
+## VERIFIKASI:
+1. Tunggu Netlify deploy selesai
+2. Buka https://4leafclover.id
+3. Klik tombol "Download CV"
+4. Harus langsung ke Google Drive dengan URL yang benar!
+
+## CATATAN:
+Sekarang sistem support 2 jenis resume URL:
+1. **External URL** (Google Drive, Dropbox, dll): Masukkan URL lengkap
+2. **Local File** (upload ke server): Masukkan path relatif `/uploads/filename.pdf`
+
+Sistem akan otomatis detect dan handle dengan benar! 🎉
