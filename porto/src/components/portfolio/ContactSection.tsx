@@ -335,14 +335,12 @@ export const ContactSection = () => {
                   </div>
                 </div>
                 
-                {/* reCAPTCHA */}
-                <div className="flex justify-center">
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={RECAPTCHA_SITE_KEY}
-                    theme="dark"
-                  />
-                </div>
+                {/* reCAPTCHA Invisible */}
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  size="invisible"
+                />
                 
                 <Button
                   type="submit"

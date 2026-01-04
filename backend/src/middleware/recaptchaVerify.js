@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6Lem8T8sAAAAAKoXBEUc3u7gZ5i5zFNEm1hYGuQq'; // Production key
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6Lf49T8sAAAAAACEiOAI6BuSvUsqZBPynKADEmm5I'; // Production key - Invisible v2
 
 export const verifyRecaptcha = async (req, res, next) => {
   try {
