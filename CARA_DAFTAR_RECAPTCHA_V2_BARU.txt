@@ -1,0 +1,89 @@
+🔐 CARA DAFTAR RECAPTCHA V2 YANG BARU
+================================================
+
+MASALAH:
+- Key yang sekarang adalah reCAPTCHA v3 (tidak ada checkbox/puzzle)
+- Code kita pakai reCAPTCHA v2 (ada checkbox "I'm not a robot")
+- Perlu daftar ulang dengan v2
+
+LANGKAH-LANGKAH DAFTAR RECAPTCHA V2:
+
+1. Buka Google reCAPTCHA Admin Console:
+   https://www.google.com/recaptcha/admin
+
+2. Klik tombol "+" atau "Create" untuk buat site baru
+
+3. Isi form pendaftaran:
+   
+   Label:
+   ┌─────────────────────────────────────┐
+   │ 4leafclover.id Portfolio v2         │
+   └─────────────────────────────────────┘
+   
+   reCAPTCHA type:
+   ☐ reCAPTCHA v3
+   ☑ reCAPTCHA v2                    ← PILIH INI!
+   
+   Pilih sub-type v2:
+   ☑ "I'm not a robot" Checkbox      ← PILIH INI!
+   ☐ Invisible reCAPTCHA badge
+   
+   Domains:
+   ┌─────────────────────────────────────┐
+   │ 4leafclover.id                      │
+   │ www.4leafclover.id                  │
+   │ localhost                           │ (untuk testing lokal)
+   └─────────────────────────────────────┘
+   
+   Owners:
+   (Email Google kamu sudah otomatis terisi)
+   
+   ☑ Accept the reCAPTCHA Terms of Service
+   
+   ☐ Send alerts to owners (optional)
+
+4. Klik "Submit"
+
+5. Setelah submit, kamu akan dapat 2 keys:
+   
+   ┌─────────────────────────────────────────────────────────┐
+   │ Site Key (untuk Frontend)                               │
+   │ 6Lxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx           │
+   │                                                          │
+   │ Secret Key (untuk Backend)                              │
+   │ 6Lxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx           │
+   └─────────────────────────────────────────────────────────┘
+
+6. COPY kedua keys tersebut!
+
+SETELAH DAPAT KEYS BARU:
+
+Kasih tau saya kedua keys-nya, nanti saya akan:
+1. Update porto/.env.production dengan Site Key baru
+2. Update backend/src/middleware/recaptchaVerify.js dengan Secret Key baru
+3. Commit dan push ke GitHub
+4. Update backend di VPS
+5. Test reCAPTCHA di production
+
+CATATAN PENTING:
+- Pastikan pilih "reCAPTCHA v2" bukan v3
+- Pastikan pilih "I'm not a robot Checkbox" bukan Invisible
+- Tambahkan domain 4leafclover.id dan www.4leafclover.id
+- Jangan share Secret Key ke siapapun!
+
+SCREENSHOT REFERENSI:
+Saat pilih type, harus seperti ini:
+┌─────────────────────────────────────────┐
+│ reCAPTCHA type                          │
+│ ○ reCAPTCHA v3                          │
+│ ● reCAPTCHA v2                          │
+│   ● "I'm not a robot" Checkbox          │
+│   ○ Invisible reCAPTCHA badge           │
+└─────────────────────────────────────────┘
+
+SETELAH SELESAI:
+Kasih tau saya:
+1. Site Key (untuk frontend)
+2. Secret Key (untuk backend)
+
+Nanti saya langsung update code dan deploy! 🚀
