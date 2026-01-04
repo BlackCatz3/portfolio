@@ -53,7 +53,7 @@ export const AdminMessages = () => {
         await messagesAPI.updateStatus(message.id, 'read');
         fetchMessages();
       } catch (error) {
-        console.error('Failed to update status');
+        // Silently fail - status update is not critical
       }
     }
   };

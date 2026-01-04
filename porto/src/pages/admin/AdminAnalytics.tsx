@@ -49,7 +49,6 @@ export default function AdminAnalytics() {
       setActivities(activitiesRes.data.data);
       setChartData(chartRes.data.data);
     } catch (error) {
-      console.error("Failed to fetch analytics:", error);
       toast.error("Failed to load analytics data");
     } finally {
       setLoading(false);

@@ -65,7 +65,6 @@ export const AdminProfile = () => {
       toast.success("Image uploaded and saved successfully");
     } catch (error) {
       toast.error("Failed to upload image");
-      console.error("Upload error:", error);
     } finally {
       setUploading(false);
     }

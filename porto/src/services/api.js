@@ -4,10 +4,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 // Get base URL without /api suffix for uploads
 export const getUploadBaseURL = () => {
-  // Debug logs
-  console.log('🔍 DEBUG - API_BASE_URL:', API_BASE_URL);
-  console.log('🔍 DEBUG - VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
-  
   // More robust URL handling
   try {
     // Remove /api suffix if present
@@ -21,10 +17,8 @@ export const getUploadBaseURL = () => {
     // Fix malformed URLs (e.g., https:/ instead of https://)
     baseUrl = baseUrl.replace(/^(https?):\/([^/])/, '$1://$2');
     
-    console.log('✅ DEBUG - Final Upload Base URL:', baseUrl);
     return baseUrl;
   } catch (error) {
-    console.error('❌ ERROR in getUploadBaseURL:', error);
     // Fallback to production URL
     return 'https://api.4leafclover.id';
   }
