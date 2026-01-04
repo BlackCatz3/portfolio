@@ -1,0 +1,108 @@
+🔍 INVESTIGASI: SPAM MASIH MASUK DENGAN TEST KEY
+================================================
+
+## ❌ MASALAH:
+
+Test key sudah diset (`6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`) tapi spam masih masuk!
+
+## 🤔 KEMUNGKINAN PENYEBAB:
+
+### 1. Bot Bypass Frontend (Langsung Hit API Backend)
+Bot tidak pakai form frontend, langsung POST ke:
+```
+https://api.4leafclover.id/api/messages
+```
+
+Dengan fake reCAPTCHA token!
+
+### 2. Test Key Accept Semua Token
+Test key Google **SELALU accept** semua token, bahkan token fake!
+
+**Ini adalah masalah test key:**
+- Test key untuk testing saja
+- Test key tidak validate token
+- Bot bisa kirim token random dan tetap lolos!
+
+---
+
+## ✅ SOLUSI REAL:
+
+### MASALAH SEBENARNYA:
+
+**Test key TIDAK AMAN untuk production!**
+
+Test key akan accept:
+- Token valid ✅
+- Token fake ✅
+- Token random ✅
+- Bahkan tanpa token pun bisa lolos!
+
+**Ini kenapa Google bilang: "DO NOT use test keys in production"**
+
+---
+
+## 🎯 SOLUSI YANG BENAR:
+
+### Option 1: Kembalikan ke Production Key + Tambah Proteksi Lain
+
+1. **Kembalikan ke production key:**
+   - Site: `6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5`
+   - Secret: `6Lf49T8sAAAAAACEiOAI6BuSvUsqZBPynKADEmm5I`
+
+2. **Tetap pakai proteksi yang sudah ada:**
+   - ✅ Honeypot field
+   - ✅ Time validation
+   - ✅ Rate limiting (3 pesan/15 menit)
+   - ✅ Input validation
+
+3. **Tambah IP Blocking:**
+   - Block IP yang spam
+   - Tambah blacklist di backend
+
+---
+
+### Option 2: Ganti ke hCaptcha (Bisa Set Difficulty)
+
+hCaptcha bisa set difficulty level:
+- Easy: Jarang muncul puzzle
+- Moderate: Kadang muncul puzzle
+- Difficult: Sering muncul puzzle
+- Always Challenge: **SELALU muncul puzzle**
+
+**Cara implement hCaptcha:**
+1. Daftar di https://www.hcaptcha.com
+2. Pilih difficulty: "Always Challenge"
+3. Ganti library dari react-google-recaptcha ke @hcaptcha/react-hcaptcha
+4. Update code
+
+---
+
+## 🚨 KESIMPULAN:
+
+**Test key TIDAK bisa stop spam!**
+
+Test key hanya untuk testing, bukan untuk production. Bot bisa kirim token fake dan tetap lolos.
+
+**Rekomendasi:**
+1. Kembalikan ke production key
+2. Tambah IP blocking untuk spam
+3. Atau ganti ke hCaptcha dengan "Always Challenge" mode
+
+---
+
+## 📝 NEXT STEPS:
+
+Pilih salah satu:
+
+**A. Kembalikan ke Production Key + IP Blocking**
+- Cepat implement
+- Pakai proteksi yang sudah ada
+- Tambah IP blacklist
+
+**B. Ganti ke hCaptcha**
+- Puzzle selalu muncul (Always Challenge mode)
+- Lebih secure
+- Butuh update code
+
+Mana yang kamu pilih?
+

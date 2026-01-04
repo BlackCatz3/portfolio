@@ -40,8 +40,8 @@ export const ContactSection = () => {
   const [formStartTime] = useState(Date.now()); // Track when form was loaded
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   
-  // Use Google Test Key - Puzzle will ALWAYS appear
-  const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // Test key - puzzle always shows
+  // Production reCAPTCHA v2 Checkbox key
+  const RECAPTCHA_SITE_KEY = "6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5";
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,0 +1,86 @@
+🔧 UPDATE NETLIFY ENVIRONMENT VARIABLE - TEST KEY
+================================================
+
+## ❌ MASALAH DITEMUKAN:
+
+Frontend code sudah hardcode test key:
+```javascript
+const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+```
+
+Tapi Netlify environment variable masih pakai production key lama!
+
+---
+
+## ✅ SOLUSI:
+
+### OPTION 1: Update Netlify Environment Variable (RECOMMENDED)
+
+1. **Login ke Netlify:**
+   - https://app.netlify.com
+
+2. **Pilih Site:**
+   - Klik "4leafclover.id"
+
+3. **Buka Site Configuration:**
+   - Tab "Site configuration"
+   - Atau klik "Site settings"
+
+4. **Environment Variables:**
+   - Scroll ke "Environment variables"
+   - Atau klik "Environment variables" di sidebar
+
+5. **Edit Variable:**
+   - Cari `VITE_RECAPTCHA_SITE_KEY`
+   - Klik "Options" → "Edit"
+   - Ganti value dengan: `6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`
+   - Save
+
+6. **Trigger Redeploy:**
+   - Tab "Deploys"
+   - Klik "Trigger deploy" → "Clear cache and deploy site"
+
+---
+
+### OPTION 2: Hapus Environment Variable (FASTER)
+
+Karena code sudah hardcode test key, kita bisa hapus environment variable:
+
+1. Login ke Netlify
+2. Site configuration → Environment variables
+3. Cari `VITE_RECAPTCHA_SITE_KEY`
+4. Klik "Options" → "Delete"
+5. Trigger redeploy
+
+**Kenapa ini work?**
+Code sudah hardcode test key, jadi tidak perlu environment variable lagi.
+
+---
+
+## 🚀 LANGKAH CEPAT:
+
+Saya rekomendasikan **OPTION 2** (hapus environment variable):
+
+1. Buka: https://app.netlify.com/sites/4leafclover/configuration/env
+2. Delete `VITE_RECAPTCHA_SITE_KEY`
+3. Trigger deploy: https://app.netlify.com/sites/4leafclover/deploys
+4. Klik "Trigger deploy" → "Clear cache and deploy site"
+
+Setelah deploy selesai (2-3 menit):
+- Hard refresh browser (Ctrl+Shift+R)
+- Test form
+- Puzzle HARUS muncul!
+
+---
+
+## 📝 CATATAN:
+
+**Kenapa spam masih masuk?**
+
+Frontend masih pakai production key dari Netlify environment variable, bukan test key dari code!
+
+**Setelah update:**
+- Frontend akan pakai test key (hardcoded)
+- Puzzle SELALU muncul
+- Spam langsung berhenti
+
