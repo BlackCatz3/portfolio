@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Trash2, Eye, Clock, CheckCircle } from "lucide-react";
+import { Mail, Trash2, Eye, Clock, CheckCircle, CheckSquare, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { messagesAPI } from "@/services/api";
 import { toast } from "sonner";
@@ -20,13 +20,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const AdminMessages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     fetchMessages();
@@ -67,6 +70,49 @@ export const AdminMessages = () => {
       fetchMessages();
     } catch (error) {
       toast.error("Failed to delete message");
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === messages.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(messages.map(m => m.id));
+    }
+  };
+
+  const handleSelectMessage = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(selectedId => selectedId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleBulkMarkAsRead = async () => {
+    try {
+      const promises = selectedIds.map(id => 
+        messagesAPI.updateStatus(id, 'read')
+      );
+      await Promise.all(promises);
+      toast.success(`${selectedIds.length} message(s) marked as read`);
+      setSelectedIds([]);
+      fetchMessages();
+    } catch (error) {
+      toast.error("Failed to mark messages as read");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      const promises = selectedIds.map(id => messagesAPI.delete(id));
+      await Promise.all(promises);
+      toast.success(`${selectedIds.length} message(s) deleted successfully`);
+      setBulkDeleteDialogOpen(false);
+      setSelectedIds([]);
+      fetchMessages();
+    } catch (error) {
+      toast.error("Failed to delete messages");
     }
   };
 
@@ -113,6 +159,56 @@ export const AdminMessages = () => {
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {messages.length > 0 && (
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleSelectAll}
+                className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
+              >
+                {selectedIds.length === messages.length ? (
+                  <CheckSquare className="h-5 w-5" />
+                ) : (
+                  <Square className="h-5 w-5" />
+                )}
+                <span>
+                  {selectedIds.length === messages.length 
+                    ? 'Deselect All' 
+                    : 'Select All'}
+                </span>
+              </button>
+              {selectedIds.length > 0 && (
+                <span className="text-sm text-muted-foreground">
+                  {selectedIds.length} selected
+                </span>
+              )}
+            </div>
+            {selectedIds.length > 0 && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleBulkMarkAsRead}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Mark as Read
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Selected
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Messages List */}
       <div className="space-y-2">
         {messages.length === 0 ? (
@@ -131,6 +227,10 @@ export const AdminMessages = () => {
               }`}
             >
               <div className="flex items-center gap-4 flex-1">
+                <Checkbox
+                  checked={selectedIds.includes(message.id)}
+                  onCheckedChange={() => handleSelectMessage(message.id)}
+                />
                 <div className={`p-2 rounded-full ${
                   message.status === 'unread' ? 'bg-primary/20' : 'bg-muted'
                 }`}>
@@ -226,6 +326,22 @@ export const AdminMessages = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.length} message(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {selectedIds.length} selected message(s). This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete}>Delete All</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
