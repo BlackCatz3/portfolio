@@ -1,0 +1,26 @@
+🚀 TRIGGER NETLIFY AUTO-DEPLOY
+================================================
+
+Timestamp: 2026-01-04 (Sunday)
+
+This file is created to trigger Netlify auto-deploy after environment variable was set.
+
+## What Changed:
+- Environment variable `VITE_RECAPTCHA_SITE_KEY` was set in Netlify
+- Value: 6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+- This commit will trigger Netlify to rebuild with the new environment variable
+
+## Expected Result:
+- Netlify will auto-deploy from this commit
+- Frontend will use production reCAPTCHA key
+- Badge reCAPTCHA will appear in bottom-right corner
+- Contact form will work with invisible reCAPTCHA verification
+
+## Test After Deploy:
+1. Open: https://4leafclover.id
+2. Scroll to Contact section
+3. Check badge in bottom-right corner
+4. Test form submission
+5. Verify reCAPTCHA works
+
+Deploy triggered at: 2026-01-04

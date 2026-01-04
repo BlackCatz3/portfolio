@@ -1,115 +1,286 @@
-========================================
-SET ENVIRONMENT VARIABLE SEKARANG! 🚀
-========================================
+✅ ENV VARIABLE SUDAH DISET - TINGGAL REDEPLOY!
+================================================
 
-LANGKAH SETELAH HAPUS VARIABLE LAMA:
--------------------------------------
+## 📸 DARI SCREENSHOT KAMU:
 
-STEP 1: TAMBAH VARIABLE BARU
------------------------------
-1. Masih di halaman "Environment variables"
-2. Klik tombol "Add a variable" (hijau, di kanan atas)
-3. Isi form:
-   
-   Key (nama variable):
-   VITE_API_BASE_URL
-   
-   Values (pilih scope):
-   ✅ Same value for all deploy contexts
-   
-   Value:
-   https://api.4leafclover.id/api
-   
-4. Klik "Create variable"
+**Status Environment Variable:**
+```
+✅ Variable Name: VITE_RECAPTCHA_SITE_KEY
+✅ Value: 6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+✅ Scopes: Production, Deploy Previews, Branch deploys, dll
+```
 
+**KESIMPULAN:** Environment variable SUDAH BENAR! ✅
 
-STEP 2: VERIFIKASI VARIABLE
-----------------------------
-Pastikan muncul di list:
-- Key: VITE_API_BASE_URL
-- Value: https://api.4leafclover.id/api
-- Scope: All scopes
+---
 
+## 🐛 KENAPA MASIH "LANGSUNG MASUK GA ADA CAPTA"?
 
-STEP 3: TRIGGER REDEPLOY
--------------------------
-1. Klik "Deploys" (di top menu)
-2. Klik "Trigger deploy" (tombol di kanan atas)
-3. Pilih "Clear cache and deploy site"
-4. Klik "Trigger deploy"
-5. Tunggu deploy selesai (1-2 menit)
+**Root Cause:**
+- Environment variable baru diset
+- Netlify belum redeploy dengan env var baru
+- Build yang sekarang masih pakai env var lama (atau tidak ada)
 
+**Analogi:**
+```
+Kamu sudah tulis resep baru (env var) ✅
+Tapi masakan yang disajikan masih pakai resep lama ❌
+Harus masak ulang (redeploy) baru pakai resep baru! 🍳
+```
 
-STEP 4: CEK STATUS DEPLOY
---------------------------
-Di halaman Deploys:
-- Status harus berubah dari "Building" → "Published" (hijau)
-- Commit message: "fix: auto-save profile image to database after upload"
-- Deploy time: ~1-2 menit
+---
 
+## 🚀 SOLUSI: TRIGGER REDEPLOY SEKARANG!
 
-STEP 5: TEST GAMBAR
---------------------
-Setelah deploy selesai (status Published):
+### STEP 1: Buka Netlify Dashboard
 
-1. Buka browser INCOGNITO (Ctrl + Shift + N)
-2. Buka: https://4leafclover.id/admin/login
-3. Login: admin@4leafclover.id / YourAdminPassword123!
-4. Klik menu "Home"
-5. Klik tab "Media & CV"
-6. Upload gambar baru
-7. Tunggu toast: "Image uploaded and saved successfully"
-8. Gambar akan LANGSUNG muncul!
+1. Kamu sudah di: https://app.netlify.com
+2. Pastikan site: **4leafclover.id** terpilih
 
+---
 
-VERIFIKASI DI CONSOLE:
-----------------------
-Jika ingin memastikan environment variable sudah benar:
+### STEP 2: Masuk ke Deploys Tab
+
+1. Klik **"Deploys"** di top menu
+2. Atau klik **"Deploys"** di sidebar
+
+---
+
+### STEP 3: Trigger Deploy
+
+1. Cari button **"Trigger deploy"** (biasanya di kanan atas)
+2. Klik button tersebut
+3. Pilih salah satu:
+   - **"Deploy site"** (deploy biasa)
+   - **"Clear cache and deploy site"** (recommended - lebih bersih)
+
+4. Klik untuk confirm
+
+---
+
+### STEP 4: Tunggu Deploy Selesai
+
+**Status yang akan kamu lihat:**
+```
+Building... (1-2 menit)
+      ↓
+Deploying... (30 detik)
+      ↓
+Published ✅ (selesai!)
+```
+
+**Total waktu:** 2-3 menit
+
+**Cara cek:**
+- Lihat status di halaman Deploys
+- Tunggu sampai status berubah jadi **"Published"**
+- Atau ada checkmark hijau ✅
+
+---
+
+## 🧪 TEST SETELAH DEPLOY SELESAI:
+
+### Test 1: Cek Badge reCAPTCHA
 
 1. Buka: https://4leafclover.id
-2. Tekan F12 → Console
-3. Ketik dan enter:
-   
-   fetch('https://api.4leafclover.id/api/about')
-     .then(r => r.json())
-     .then(d => console.log(d))
-   
-4. Harus muncul data about (tidak ada CORS error)
-5. Lihat profile_image path
+2. Scroll ke bagian **Contact**
+3. Lihat **pojok kanan bawah** halaman
+4. **Expected:** Ada badge kecil bertulisan "reCAPTCHA"
 
+**Kalau badge muncul:** ✅ Environment variable berhasil!
+**Kalau badge tidak muncul:** ❌ Ada masalah (lanjut troubleshooting)
 
-CEK NETWORK REQUEST:
---------------------
-1. Tekan F12 → Network tab
-2. Upload gambar
-3. Cari request "upload"
-4. Klik request tersebut
-5. Lihat "Request URL":
-   ✅ Harus: https://api.4leafclover.id/api/upload
-   ❌ Jika masih HTTP atau IP → Deploy belum selesai
+---
 
+### Test 2: Test Form Contact
 
-JIKA MASIH TIDAK MUNCUL:
--------------------------
-Kirim screenshot dari:
-1. Netlify environment variables (setelah ditambah)
-2. Netlify deploy status (harus Published)
-3. Browser Console (F12 → Console) saat upload
-4. Browser Network (F12 → Network → request upload)
+1. Isi form:
+   ```
+   Name: Test User
+   Email: test@example.com
+   Message: Testing reCAPTCHA invisible
+   ```
 
+2. Klik **"Send Message"**
 
-CATATAN PENTING:
-----------------
-- Pastikan variable name PERSIS: VITE_API_BASE_URL
-- Pastikan value PERSIS: https://api.4leafclover.id/api
-- Pastikan scope: All scopes (atau Same value for all)
-- Pastikan sudah trigger redeploy
-- Tunggu sampai deploy selesai (Published)
+3. **Expected Behavior:**
+   - Button berubah jadi "Sending..." (loading)
+   - reCAPTCHA bekerja di background (tidak terlihat)
+   - Setelah 1-2 detik, muncul toast: "Message sent successfully!"
+   - Form ter-reset otomatis
 
+4. **Kalau suspicious activity:**
+   - Mungkin muncul puzzle challenge
+   - Selesaikan puzzle
+   - Message tetap terkirim
 
-JAMINAN:
---------
-Setelah environment variable benar dan deploy selesai,
-gambar PASTI akan muncul! 🎯
+---
 
-Ini adalah fix terakhir yang dibutuhkan!
+### Test 3: Cek di Browser Console (Optional)
+
+1. Tekan **F12** (buka Developer Tools)
+2. Ketik di Console:
+   ```javascript
+   import.meta.env.VITE_RECAPTCHA_SITE_KEY
+   ```
+3. **Expected:** `"6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5"`
+
+**Kalau hasilnya:**
+- ✅ Production key → Environment variable berhasil!
+- ❌ Test key atau undefined → Masih pakai build lama
+
+---
+
+### Test 4: Test Rate Limiting
+
+1. Kirim 3 pesan berturut-turut (cepat)
+2. Coba kirim pesan ke-4
+3. **Expected:** Error "Too many messages sent. Please try again after 15 minutes."
+
+**Ini membuktikan:**
+- ✅ reCAPTCHA bekerja
+- ✅ Backend verify token
+- ✅ Rate limiting aktif
+
+---
+
+## 📊 COMPARISON:
+
+### SEBELUM Redeploy (SEKARANG):
+```
+Netlify Build:
+  VITE_RECAPTCHA_SITE_KEY = undefined (atau test key)
+      ↓
+Frontend tidak load reCAPTCHA
+      ↓
+Tidak ada badge
+      ↓
+executeAsync() return null atau test token
+      ↓
+Message langsung masuk tanpa verifikasi ❌
+```
+
+### SETELAH Redeploy (NANTI):
+```
+Netlify Build:
+  VITE_RECAPTCHA_SITE_KEY = production key ✅
+      ↓
+Frontend load reCAPTCHA dengan benar
+      ↓
+Badge muncul di pojok
+      ↓
+executeAsync() return production token
+      ↓
+Backend verify dengan Google
+      ↓
+Message terkirim dengan verifikasi ✅
+```
+
+---
+
+## 🐛 TROUBLESHOOTING:
+
+### Problem 1: Badge Masih Tidak Muncul Setelah Redeploy
+
+**Possible Causes:**
+- Browser cache
+- Deploy belum selesai
+
+**Solution:**
+1. Tunggu sampai deploy status "Published"
+2. Clear browser cache:
+   - Tekan **CTRL + SHIFT + DELETE**
+   - Pilih "Cached images and files"
+   - Klik "Clear data"
+3. Hard refresh:
+   - Tekan **CTRL + F5**
+4. Atau buka di Incognito mode (CTRL + SHIFT + N)
+
+---
+
+### Problem 2: Masih Pakai Test Key di Console
+
+**Check:**
+```javascript
+import.meta.env.VITE_RECAPTCHA_SITE_KEY
+```
+
+**Kalau masih test key:**
+1. Pastikan deploy sudah "Published"
+2. Clear cache dan hard refresh
+3. Cek env var di Netlify (pastikan tidak ada typo)
+
+---
+
+### Problem 3: Deploy Gagal
+
+**Possible Causes:**
+- Build error
+- Dependency issue
+
+**Solution:**
+1. Lihat deploy log di Netlify
+2. Cari error message
+3. Screenshot dan tunjukkan ke saya
+
+---
+
+## ✅ CHECKLIST:
+
+Sebelum test, pastikan:
+
+- [x] Environment variable sudah diset (DONE - dari screenshot)
+- [ ] Masuk ke Deploys tab
+- [ ] Klik "Trigger deploy"
+- [ ] Pilih "Clear cache and deploy site"
+- [ ] Tunggu sampai status "Published"
+- [ ] Clear browser cache
+- [ ] Hard refresh (CTRL+F5)
+- [ ] Test di https://4leafclover.id
+- [ ] Cek badge muncul
+- [ ] Test form contact
+- [ ] Verify message terkirim
+
+---
+
+## 🎯 LANGKAH SINGKAT:
+
+1. **Trigger Redeploy** (1 menit)
+   - Deploys → Trigger deploy → Clear cache and deploy site
+
+2. **Tunggu Deploy** (2-3 menit)
+   - Tunggu sampai "Published"
+
+3. **Test** (2 menit)
+   - Buka https://4leafclover.id
+   - Cek badge muncul
+   - Test form contact
+
+**Total:** 5-6 menit
+
+---
+
+## ✨ SUMMARY:
+
+**Status Sekarang:**
+- ✅ Environment variable: SUDAH DISET
+- ✅ Value: BENAR
+- ✅ Scope: BENAR
+- ❌ Deploy: BELUM REDEPLOY
+
+**Yang Perlu Dilakukan:**
+- 🚀 Trigger redeploy di Netlify
+- ⏳ Tunggu sampai "Published"
+- 🧪 Test di production
+
+**Estimated Time:** 5-6 menit
+
+Setelah redeploy, reCAPTCHA akan bekerja dengan sempurna! 🛡️✨
+
+---
+
+## 🎉 GOOD LUCK!
+
+Tinggal trigger redeploy dan tunggu beberapa menit, masalah akan selesai! 🚀
+
+Kalau ada masalah atau error, screenshot dan tunjukkan ke saya ya! 📸
