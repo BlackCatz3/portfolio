@@ -1,0 +1,48 @@
+# FIX NODE_ENV PRODUCTION
+
+## Masalah:
+Backend tidak menggunakan `/var/www/uploads/` karena `NODE_ENV` tidak di-set ke `production`.
+
+## Solusi:
+
+Jalankan command ini di VPS untuk set NODE_ENV di docker-compose:
+
+```bash
+cd /root/n8n-production/portfolio/backend
+
+# Edit docker-compose.yml
+nano docker-compose.yml
+```
+
+Tambahkan `NODE_ENV=production` di environment variables:
+
+```yaml
+services:
+  backend:
+    environment:
+      - NODE_ENV=production  # ← TAMBAHKAN INI
+      - DB_HOST=portfolio-db
+      - DB_PORT=5432
+      - DB_NAME=portfolio_cms_2026
+      - DB_USER=portfolio_user
+      - DB_PASSWORD=your_password
+      - JWT_SECRET=your_jwt_secret
+```
+
+Setelah edit, save (Ctrl+O, Enter, Ctrl+X) dan restart:
+
+```bash
+docker-compose restart backend
+docker-compose logs --tail=50 backend
+```
+
+## Atau Lebih Cepat: Gunakan Absolute Path
+
+Edit `backend/src/middleware/upload.js` dan ganti dengan absolute path langsung:
+
+```javascript
+// Gunakan absolute path langsung
+const uploadsDir = '/var/www/uploads';
+```
+
+Hapus conditional `process.env.NODE_ENV` dan langsung pakai `/var/www/uploads/`.

@@ -3,11 +3,8 @@ import path from 'path';
 import fs from 'fs';
 
 // Create uploads directory if it doesn't exist
-// Use /var/www/uploads for production (served by Nginx)
-// Use ./uploads for development
-const uploadsDir = process.env.NODE_ENV === 'production' 
-  ? '/var/www/uploads' 
-  : './uploads';
+// Always use /var/www/uploads (served by Nginx)
+const uploadsDir = '/var/www/uploads';
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
