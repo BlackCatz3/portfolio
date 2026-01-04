@@ -172,6 +172,15 @@ export const analyticsAPI = {
   getChartData: () => api.get('/analytics/chart'),
 };
 
+// Rate Limit Settings API
+export const rateLimitSettingsAPI = {
+  get: () => api.get('/rate-limit-settings'),
+  update: (data) => api.put('/rate-limit-settings', data),
+  getStats: () => api.get('/rate-limit-settings/stats'),
+  clearEmail: (email) => api.delete(`/rate-limit-settings/email/${email}`),
+  cleanup: () => api.post('/rate-limit-settings/cleanup'),
+};
+
 // Helper functions
 export const isAuthenticated = () => {
   return localStorage.getItem('token') !== null;

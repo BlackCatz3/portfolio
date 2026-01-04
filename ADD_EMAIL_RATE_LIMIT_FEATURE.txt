@@ -1,0 +1,278 @@
+✅ FITUR EMAIL RATE LIMITING SUDAH DITAMBAHKAN!
+================================================
+
+## 🎯 FITUR BARU:
+
+**Rate Limiting per Email Address dengan Settings yang Bisa Diatur dari Admin!**
+
+Sekarang kamu bisa:
+1. ✅ Limit berapa kali email yang sama bisa kirim pesan
+2. ✅ Atur time window (berapa menit)
+3. ✅ Enable/disable rate limiting
+4. ✅ Semua bisa diatur dari Admin Settings!
+
+---
+
+## 📊 CARA KERJA:
+
+### Rate Limiting Berlapis:
+
+**Layer 1: IP-based Rate Limiting** (sudah ada)
+- 3 pesan per 15 menit per IP
+- Protect dari spam IP
+
+**Layer 2: Email-based Rate Limiting** (BARU!)
+- Configurable dari admin
+- Default: 3 pesan per 60 menit per email
+- Protect dari spam email yang sama
+
+**Contoh:**
+- User A kirim dari IP 1.1.1.1 dengan email test@gmail.com
+- User B kirim dari IP 2.2.2.2 dengan email test@gmail.com
+- Kedua user ini akan kena limit yang sama untuk email test@gmail.com!
+
+---
+
+## 🗄️ DATABASE TABLES BARU:
+
+### 1. rate_limit_settings
+```sql
+- id
+- max_messages_per_email (default: 3)
+- time_window_minutes (default: 60)
+- enabled (default: true)
+- created_at
+- updated_at
+```
+
+### 2. email_rate_limits
+```sql
+- id
+- email (unique)
+- message_count
+- first_message_at
+- last_message_at
+- created_at
+- updated_at
+```
+
+---
+
+## 🔧 BACKEND CHANGES:
+
+### Files Created:
+1. ✅ `backend/src/database/create-rate-limit-settings.sql`
+2. ✅ `backend/src/database/create-rate-limit-tables.js`
+3. ✅ `backend/src/controllers/rateLimitSettingsController.js`
+4. ✅ `backend/src/middleware/emailRateLimiter.js`
+5. ✅ `backend/src/routes/rateLimitSettingsRoutes.js`
+
+### Files Modified:
+1. ✅ `backend/src/server.js` - Added rate limit settings routes
+2. ✅ `backend/src/routes/messagesRoutes.js` - Added email rate limiter middleware
+
+### New API Endpoints:
+```
+GET    /api/rate-limit-settings          - Get settings
+PUT    /api/rate-limit-settings          - Update settings
+GET    /api/rate-limit-settings/stats    - Get email stats
+DELETE /api/rate-limit-settings/email/:email - Clear email limit
+POST   /api/rate-limit-settings/cleanup  - Cleanup old records
+```
+
+---
+
+## 🎨 FRONTEND CHANGES:
+
+### Files Modified:
+1. ✅ `porto/src/services/api.js` - Added rateLimitSettingsAPI
+2. ✅ `porto/src/pages/admin/AdminSettings.tsx` - Added Rate Limiting tab
+
+### New Admin UI:
+- Tab baru "Rate Limiting" di Admin Settings
+- Toggle untuk enable/disable
+- Input untuk max messages per email
+- Input untuk time window (minutes)
+- Preview current settings
+- Recommended settings guide
+
+---
+
+## 🚀 CARA DEPLOY:
+
+### 1. Create Database Tables
+
+```bash
+# SSH ke VPS
+ssh root@43.228.213.128
+
+# Masuk ke project folder
+cd /root/n8n-production/portfolio
+
+# Pull latest code
+git pull origin main
+
+# Run migration
+docker exec -it portfolio-backend node src/database/create-rate-limit-tables.js
+```
+
+### 2. Restart Backend
+
+```bash
+docker compose restart backend
+```
+
+### 3. Deploy Frontend
+
+Frontend akan auto-deploy dari Netlify (sudah push ke GitHub)
+
+---
+
+## 🧪 CARA TESTING:
+
+### Test 1: Email Rate Limiting
+
+1. **Buka Admin Settings:**
+   - Login: https://4leafclover.id/admin
+   - Menu: Settings
+   - Tab: Rate Limiting
+
+2. **Set Rate Limit:**
+   - Max Messages: 3
+   - Time Window: 60 minutes
+   - Enable: ON
+   - Save
+
+3. **Test dari Frontend:**
+   - Buka: https://4leafclover.id
+   - Kirim pesan 1 dengan email test@gmail.com → Success ✅
+   - Kirim pesan 2 dengan email test@gmail.com → Success ✅
+   - Kirim pesan 3 dengan email test@gmail.com → Success ✅
+   - Kirim pesan 4 dengan email test@gmail.com → Error 429 ❌
+   - Error message: "Too many messages from this email. Please try again in X minutes."
+
+### Test 2: Different Emails
+
+1. Kirim 3 pesan dengan email test1@gmail.com → All success ✅
+2. Kirim 1 pesan dengan email test2@gmail.com → Success ✅
+3. Email berbeda tidak kena limit dari email lain!
+
+### Test 3: Disable Rate Limiting
+
+1. Admin Settings → Rate Limiting
+2. Toggle OFF
+3. Save
+4. Kirim banyak pesan dengan email sama → All success ✅
+
+---
+
+## 📊 MONITORING:
+
+### Check Email Rate Limit Stats:
+
+```bash
+# Via API (need auth token)
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://api.4leafclover.id/api/rate-limit-settings/stats
+```
+
+Response:
+```json
+[
+  {
+    "email": "test@gmail.com",
+    "message_count": 3,
+    "first_message_at": "2026-01-04T15:30:00Z",
+    "last_message_at": "2026-01-04T15:35:00Z",
+    "minutes_since_first": 5
+  }
+]
+```
+
+### Check Backend Logs:
+
+```bash
+docker logs portfolio-backend --tail 100 -f
+```
+
+Look for:
+- ✅ `Email rate limit: test@gmail.com - 1/3 messages`
+- ✅ `Email rate limit: test@gmail.com - 2/3 messages`
+- ✅ `Email rate limit: test@gmail.com - 3/3 messages`
+- ⚠️ `Email rate limit exceeded: test@gmail.com - 3/3 messages`
+
+---
+
+## 🔧 ADMIN FEATURES:
+
+### Clear Email Rate Limit:
+
+Kalau ada user legitimate yang kena limit, admin bisa clear:
+
+```bash
+# Via API
+curl -X DELETE \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  https://api.4leafclover.id/api/rate-limit-settings/email/test@gmail.com
+```
+
+### Cleanup Old Records:
+
+Hapus records yang sudah > 7 hari:
+
+```bash
+# Via API
+curl -X POST \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  https://api.4leafclover.id/api/rate-limit-settings/cleanup
+```
+
+---
+
+## ⚙️ RECOMMENDED SETTINGS:
+
+### Strict (Anti-Spam Ketat):
+- Max Messages: 3
+- Time Window: 60 minutes
+- Use case: High spam risk
+
+### Moderate (Balanced):
+- Max Messages: 5
+- Time Window: 120 minutes
+- Use case: Normal usage
+
+### Lenient (Flexible):
+- Max Messages: 10
+- Time Window: 240 minutes
+- Use case: Low spam risk, high legitimate traffic
+
+---
+
+## 🛡️ TOTAL PROTECTION SEKARANG:
+
+1. ✅ Production reCAPTCHA key (reject fake tokens)
+2. ✅ Token format validation
+3. ✅ Hostname verification
+4. ✅ Token age check
+5. ✅ IP blacklist
+6. ✅ Enhanced logging
+7. ✅ Honeypot field
+8. ✅ Time-based validation
+9. ✅ IP-based rate limiting (3/15min)
+10. ✅ **Email-based rate limiting (configurable)** ← NEW!
+11. ✅ Input validation
+
+**11 LAYER PROTECTION!** 🎯
+
+---
+
+## 📝 NEXT STEPS:
+
+1. ✅ Pull latest code
+2. ✅ Run database migration
+3. ✅ Restart backend
+4. ✅ Test rate limiting
+5. ✅ Configure settings dari admin
+6. ✅ Monitor logs
+
+**Spam protection sekarang jauh lebih powerful!** 🚀

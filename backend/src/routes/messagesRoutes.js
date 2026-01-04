@@ -10,11 +10,12 @@ import {
 import { authenticateToken } from '../middleware/auth.js';
 import { contactFormLimiter } from '../middleware/rateLimiter.js';
 import { verifyRecaptcha } from '../middleware/recaptchaVerify.js';
+import { checkEmailRateLimit } from '../middleware/emailRateLimiter.js';
 
 const router = express.Router();
 
-// Public route with rate limiting, reCAPTCHA verification, and validation
-router.post('/', contactFormLimiter, verifyRecaptcha, validateMessage, createMessage);
+// Public route with rate limiting, email rate limiting, reCAPTCHA verification, and validation
+router.post('/', contactFormLimiter, checkEmailRateLimit, verifyRecaptcha, validateMessage, createMessage);
 
 // Protected routes
 router.get('/', authenticateToken, getAllMessages);

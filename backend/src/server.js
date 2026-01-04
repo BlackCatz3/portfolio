@@ -19,6 +19,7 @@ import skillsRoutes from './routes/skillsRoutes.js';
 import messagesRoutes from './routes/messagesRoutes.js';
 import certificationsRoutes from './routes/certificationsRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import rateLimitSettingsRoutes from './routes/rateLimitSettingsRoutes.js';
 
 // Import database
 import pool from './config/database.js';
@@ -99,6 +100,7 @@ app.use('/api/skills', skillsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/certifications', certificationsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/rate-limit-settings', rateLimitSettingsRoutes);
 
 // 404 handler
 app.use((req, res) => {
