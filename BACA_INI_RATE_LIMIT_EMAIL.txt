@@ -1,0 +1,52 @@
+✅ FITUR EMAIL RATE LIMITING SUDAH AKTIF!
+==========================================
+
+SUDAH SELESAI:
+--------------
+✅ Backend deployed & running
+✅ Database tables created
+✅ Frontend code pushed
+✅ Netlify auto-deploy triggered
+
+TUNGGU 2-3 MENIT untuk Netlify deploy selesai, lalu:
+
+CARA PAKAI:
+-----------
+
+1. Login admin: https://4leafclover.id/admin/login
+
+2. Klik "Settings" → Tab "Rate Limiting"
+
+3. Atur:
+   - Enable/Disable toggle
+   - Max Messages per Email (1-100)
+   - Time Window in Minutes (1-1440)
+
+4. Klik "Save Settings"
+
+5. Test dari contact form!
+
+DEFAULT SETTING:
+----------------
+- 3 messages per 60 minutes
+- Enabled: YES
+
+ARTINYA:
+--------
+1 email hanya bisa kirim 3 pesan per jam.
+Pesan ke-4 akan ditolak sampai 1 jam berlalu.
+
+PROTEKSI SPAM SEKARANG:
+------------------------
+1. reCAPTCHA v2 (puzzle)
+2. IP rate limit (3 per 15 min)
+3. Email rate limit (3 per 60 min) ⭐ BARU!
+
+DOKUMENTASI LENGKAP:
+--------------------
+- CARA_ATUR_RATE_LIMIT_EMAIL.txt (panduan lengkap)
+- EMAIL_RATE_LIMIT_READY.txt (testing guide)
+- RATE_LIMIT_EMAIL_DEPLOYMENT_SUCCESS.txt (technical details)
+
+SELESAI! 🎉
+Tunggu Netlify deploy, lalu coba buka admin settings!
