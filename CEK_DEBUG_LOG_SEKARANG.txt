@@ -1,0 +1,52 @@
+🔍 CEK DEBUG LOG DI BROWSER - AKAR MASALAH DITEMUKAN!
+=======================================================
+
+## AKAR MASALAH:
+URL yang dihasilkan malformed: `https:/.4leafclover.id/api/uploads/...`
+(hanya ada 1 slash setelah https: padahal seharusnya 2 slash)
+
+## SOLUSI YANG SUDAH DITERAPKAN:
+✅ Update fungsi getUploadBaseURL() dengan:
+   - Debug console logs untuk tracking
+   - Robust URL handling (fix malformed URLs)
+   - Regex untuk remove /api suffix dengan benar
+   - Fallback ke production URL jika error
+
+## LANGKAH CEK SEKARANG:
+
+1. TUNGGU NETLIFY DEPLOY SELESAI (1-2 menit)
+   - Cek di: https://app.netlify.com/sites/[your-site]/deploys
+   - Tunggu sampai status "Published"
+
+2. BUKA WEBSITE DI BROWSER
+   https://4leafclover.id/admin/home
+
+3. BUKA BROWSER CONSOLE (F12)
+   - Klik tab "Console"
+   - Cari log dengan emoji 🔍 dan ✅
+
+4. YANG HARUS TERLIHAT DI CONSOLE:
+   🔍 DEBUG - API_BASE_URL: https://api.4leafclover.id/api
+   🔍 DEBUG - VITE_API_BASE_URL: https://api.4leafclover.id/api
+   ✅ DEBUG - Final Upload Base URL: https://api.4leafclover.id
+
+5. CEK GAMBAR PROFILE
+   - Scroll ke bawah ke bagian "Media & CV"
+   - Lihat apakah gambar profile muncul
+   - Jika masih tidak muncul, screenshot console log dan kirim ke saya
+
+## JIKA MASIH TIDAK MUNCUL:
+Kirim screenshot dari:
+1. Browser Console (semua log yang ada)
+2. Network tab (filter: uploads)
+3. Gambar profile section
+
+## BACKEND STATUS (SUDAH 100% BENAR):
+✅ Database: /uploads/1767516735604-650014329.jpg
+✅ File exists: /var/www/uploads/1767516735604-650014329.jpg
+✅ Permissions: www-data:www-data 644
+✅ Nginx: Serving /uploads/ correctly
+✅ HTTPS: SSL certificate valid
+✅ CORS: Headers configured
+
+Masalahnya PASTI di frontend URL generation!
