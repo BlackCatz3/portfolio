@@ -164,24 +164,28 @@ export const ContactSection = () => {
       return;
     }
     
-    // Validate reCAPTCHA
-    const recaptchaValue = recaptchaRef.current?.getValue();
-    if (!recaptchaValue) {
-      toast.error("Please complete the reCAPTCHA verification");
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
+      // Execute invisible reCAPTCHA
+      const recaptchaToken = await recaptchaRef.current?.executeAsync();
+      
+      if (!recaptchaToken) {
+        toast.error("reCAPTCHA verification failed. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Send message with reCAPTCHA token
       await messagesAPI.create({
         ...formData,
-        recaptchaToken: recaptchaValue,
+        recaptchaToken: recaptchaToken,
       });
+      
       toast.success("Message sent successfully! I'll get back to you soon.");
       setFormData({ name: "", email: "", message: "" });
       setFormErrors({});
+      
       // Reset reCAPTCHA
       recaptchaRef.current?.reset();
     } catch (error: any) {
@@ -196,6 +200,7 @@ export const ContactSection = () => {
       } else {
         toast.error(errorMessage);
       }
+      
       // Reset reCAPTCHA on error
       recaptchaRef.current?.reset();
     } finally {
