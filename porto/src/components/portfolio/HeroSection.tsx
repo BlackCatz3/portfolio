@@ -183,7 +183,15 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                 onClick={about?.resume_url ? handleCVDownload : undefined}
               >
                 {about?.resume_url ? (
-                  <a href={`${getUploadBaseURL()}${about.resume_url}`} target="_blank" rel="noopener noreferrer">
+                  <a 
+                    href={
+                      about.resume_url.startsWith('http://') || about.resume_url.startsWith('https://') 
+                        ? about.resume_url 
+                        : `${getUploadBaseURL()}${about.resume_url}`
+                    } 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
                     <Download className="h-4 w-4" />
                     Download CV
                   </a>
