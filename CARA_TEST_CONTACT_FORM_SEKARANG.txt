@@ -1,0 +1,79 @@
+✅ BACKEND SUDAH DI-REBUILD!
+===========================
+
+YANG SUDAH DIPERBAIKI:
+----------------------
+✅ Trust proxy setting sudah aktif
+✅ RECAPTCHA_SECRET_KEY sudah ter-load
+✅ Container sudah di-rebuild dengan code terbaru
+
+CARA TEST SEKARANG:
+===================
+
+1. CLEAR BROWSER CACHE:
+   - Tekan Ctrl + Shift + Delete (Windows)
+   - Atau Cmd + Shift + Delete (Mac)
+   - Pilih "Cached images and files"
+   - Klik "Clear data"
+   
+   ATAU
+   
+   - Tekan Ctrl + F5 (hard refresh)
+   - Atau buka Incognito/Private window
+
+2. BUKA WEBSITE:
+   https://4leafclover.id
+
+3. SCROLL KE CONTACT SECTION
+
+4. ISI FORM:
+   - Name: Test User
+   - Email: test@gmail.com
+   - Message: Testing contact form
+
+5. CENTANG RECAPTCHA:
+   - Puzzle akan muncul
+   - Selesaikan puzzle
+
+6. KLIK "SEND MESSAGE"
+
+7. ✅ PESAN BERHASIL DIKIRIM!
+
+JIKA MASIH ERROR:
+=================
+
+Buka browser console (F12) dan screenshot error-nya.
+Atau cek backend logs:
+
+```bash
+ssh root@43.228.213.128
+docker logs portfolio-backend --tail 50
+```
+
+Look for:
+- ✅ reCAPTCHA verified successfully
+- ✅ Email rate limit: test@gmail.com - 1/3 messages
+- ✅ Message created successfully
+
+Bukan:
+- ❌ reCAPTCHA verification failed
+- ❌ ValidationError: trust proxy
+
+TEST RATE LIMIT:
+================
+
+Setelah berhasil kirim 1 pesan, coba kirim lagi:
+
+1. Kirim pesan 2 → Success ✅
+2. Kirim pesan 3 → Success ✅
+3. Kirim pesan 4 → Error 429 ❌
+   "Too many messages from this email"
+
+CEK PESAN DI ADMIN:
+===================
+
+1. Login: https://4leafclover.id/admin/login
+2. Klik "Messages"
+3. Lihat pesan yang masuk!
+
+SEKARANG COBA! 🚀
