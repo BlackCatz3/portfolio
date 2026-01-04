@@ -1,0 +1,69 @@
+========================================
+FIX CONTACT TABLE - ADD UPDATED_AT COLUMN
+========================================
+
+MASALAH:
+- Error: column "updated_at" of relation "contact" does not exist
+- Controller mencoba update kolom updated_at tapi kolom tidak ada di table
+
+SOLUSI:
+Tambahkan kolom updated_at dan created_at ke table contact
+
+========================================
+JALANKAN SQL INI DI VPS:
+========================================
+
+ssh root@43.228.213.128
+Password: Y2BNxabkpqXTR58y
+
+# Masuk ke PostgreSQL
+docker exec -it portfolio-db psql -U postgres -d portfolio_cms_2026
+
+# Jalankan SQL berikut:
+
+-- Check struktur table contact saat ini
+\d contact
+
+-- Tambahkan kolom created_at dan updated_at jika belum ada
+ALTER TABLE contact 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Verify kolom sudah ditambahkan
+\d contact
+
+-- Keluar dari psql
+\q
+
+========================================
+ATAU JALANKAN LANGSUNG DARI COMMAND LINE:
+========================================
+
+docker exec -it portfolio-db psql -U postgres -d portfolio_cms_2026 -c "ALTER TABLE contact ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;"
+
+========================================
+VERIFY:
+========================================
+
+docker exec -it portfolio-db psql -U postgres -d portfolio_cms_2026 -c "\d contact"
+
+Expected output harus ada:
+- created_at | timestamp without time zone | default CURRENT_TIMESTAMP
+- updated_at | timestamp without time zone | default CURRENT_TIMESTAMP
+
+========================================
+SETELAH FIX:
+========================================
+
+1. Restart backend (optional, tapi recommended):
+   cd /root/n8n-production/portfolio
+   docker compose restart backend
+
+2. Test di admin panel:
+   - Login ke https://4leafclover.id/admin
+   - Klik menu "Contact"
+   - Update contact info
+   - Klik Save
+   - Seharusnya berhasil tanpa error 500
+
+========================================
