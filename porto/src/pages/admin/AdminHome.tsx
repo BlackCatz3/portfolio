@@ -54,10 +54,22 @@ export const AdminHome = () => {
     setUploading(true);
     try {
       const response = await uploadAPI.uploadImage(file);
-      setHomeData({ ...homeData, profile_image: response.data.url });
-      toast.success("Image uploaded successfully");
+      const newImageUrl = response.data.url;
+      
+      // Update state
+      const updatedData = { ...homeData, profile_image: newImageUrl };
+      setHomeData(updatedData);
+      
+      // Auto-save to database
+      await aboutAPI.update(updatedData);
+      
+      // Refresh data from server to ensure consistency
+      await fetchData();
+      
+      toast.success("Image uploaded and saved successfully");
     } catch (error) {
       toast.error("Failed to upload image");
+      console.error("Upload error:", error);
     } finally {
       setUploading(false);
     }

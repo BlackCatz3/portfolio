@@ -50,10 +50,22 @@ export const AdminProfile = () => {
     setUploading(true);
     try {
       const response = await uploadAPI.uploadImage(file);
-      setAboutData({ ...aboutData, profile_image: response.data.url });
-      toast.success("Image uploaded successfully");
+      const newImageUrl = response.data.url;
+      
+      // Update state
+      const updatedData = { ...aboutData, profile_image: newImageUrl };
+      setAboutData(updatedData);
+      
+      // Auto-save to database
+      await aboutAPI.update(updatedData);
+      
+      // Refresh data from server
+      await fetchData();
+      
+      toast.success("Image uploaded and saved successfully");
     } catch (error) {
       toast.error("Failed to upload image");
+      console.error("Upload error:", error);
     } finally {
       setUploading(false);
     }
