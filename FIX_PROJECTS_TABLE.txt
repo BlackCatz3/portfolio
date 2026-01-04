@@ -1,0 +1,68 @@
+===========================================
+FIX PROJECTS TABLE - MISSING COLUMNS
+===========================================
+
+MASALAH:
+--------
+Error saat menambahkan project:
+POST https://api.4leafclover.id/api/projects 500 (Internal Server Error)
+
+ROOT CAUSE:
+-----------
+Tabel "projects" di database missing 3 kolom yang dibutuhkan controller:
+1. updated_at - TIDAK ADA ❌
+2. category - TIDAK ADA ❌
+3. project_url - TIDAK ADA ❌
+
+SOLUSI YANG SUDAH DITERAPKAN:
+------------------------------
+✅ Menambahkan kolom "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+✅ Menambahkan kolom "category" VARCHAR(100)
+✅ Menambahkan kolom "project_url" VARCHAR(500)
+✅ Backend sudah di-restart
+
+SQL YANG DIJALANKAN:
+--------------------
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS project_url VARCHAR(500);
+
+STRUKTUR TABEL PROJECTS SEKARANG:
+----------------------------------
+- id (PRIMARY KEY)
+- title (VARCHAR 255, NOT NULL)
+- description (TEXT)
+- image_url (VARCHAR 500)
+- technologies (TEXT[])
+- github_url (VARCHAR 500)
+- live_url (VARCHAR 500) - kolom lama, masih ada
+- featured (BOOLEAN, default false)
+- display_order (INTEGER, default 0) - kolom lama, masih ada
+- created_at (TIMESTAMP)
+- order_index (INTEGER, default 0)
+- updated_at (TIMESTAMP) ✅ BARU
+- category (VARCHAR 100) ✅ BARU
+- project_url (VARCHAR 500) ✅ BARU
+
+CATATAN:
+--------
+Ada duplikasi kolom karena migrasi:
+- live_url vs project_url (keduanya ada sekarang)
+- display_order vs order_index (keduanya ada sekarang)
+
+Controller menggunakan: project_url dan order_index
+Kolom lama (live_url, display_order) tidak dipakai tapi tidak mengganggu.
+
+STATUS:
+-------
+✅ FIXED - Silakan test lagi menambahkan project di admin panel!
+
+POLA ERROR YANG SAMA:
+----------------------
+Semua error 500 sebelumnya disebabkan missing timestamp columns:
+- contact table: missing updated_at ✅ FIXED
+- certifications table: missing updated_at ✅ FIXED  
+- experiences table: missing updated_at ✅ FIXED
+- projects table: missing updated_at + category + project_url ✅ FIXED
+
+Semua tabel sekarang sudah lengkap!

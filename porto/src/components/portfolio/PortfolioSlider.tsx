@@ -13,6 +13,7 @@ const sections = ["home", "about", "experience", "projects", "contact"];
 export const PortfolioSlider = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isDark, setIsDark] = useState(true);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -63,6 +64,8 @@ export const PortfolioSlider = () => {
     const handleTouchStart = (e: TouchEvent) => {
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
+      // Hide hint after first interaction
+      setShowSwipeHint(false);
     };
     
     const handleTouchEnd = (e: TouchEvent) => {
@@ -90,6 +93,15 @@ export const PortfolioSlider = () => {
     };
   }, [currentSection, navigateToSection]);
 
+  // Auto-hide swipe hint after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSwipeHint(false);
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="h-[100svh] w-screen overflow-x-hidden overflow-y-hidden bg-background flex flex-col">
       {/* Navigation - Fixed height */}
@@ -105,7 +117,7 @@ export const PortfolioSlider = () => {
 
       {/* Horizontal Slider Container - takes remaining height */}
       <div 
-        className="flex-1 overflow-x-hidden overflow-y-hidden"
+        className="flex-1 overflow-x-hidden overflow-y-hidden relative"
         style={{ height: 'calc(100svh - 3.5rem)' }}
       >
         <motion.div
@@ -123,6 +135,39 @@ export const PortfolioSlider = () => {
           <ProjectsSection isActive={currentSection === 3} />
           <ContactSection />
         </motion.div>
+
+        {/* Swipe Hint - Mobile Only */}
+        <AnimatePresence>
+          {showSwipeHint && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ delay: 1 }}
+              className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 md:hidden pointer-events-none"
+            >
+              <div className="bg-primary/90 backdrop-blur-sm text-primary-foreground px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+                <motion.span
+                  animate={{ x: [-10, 10, -10] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="text-2xl"
+                >
+                  👆
+                </motion.span>
+                <span className="text-sm font-medium whitespace-nowrap">
+                  Swipe untuk navigasi
+                </span>
+                <motion.span
+                  animate={{ x: [-10, 10, -10] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="text-2xl"
+                >
+                  👉
+                </motion.span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Footer */}
