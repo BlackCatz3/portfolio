@@ -1,0 +1,93 @@
+=================================================================
+🔒 INSTALL SSL CERTIFICATE - DNS SUDAH READY!
+=================================================================
+
+DNS api.4leafclover.id sudah propagate dan mengarah ke 43.228.213.128!
+Sekarang kita bisa install SSL certificate.
+
+
+STEP 1: LOGIN KE VPS
+-----------------------------------------------------------------
+ssh root@43.228.213.128
+
+
+STEP 2: CEK DNS DARI VPS (OPSIONAL)
+-----------------------------------------------------------------
+nslookup api.4leafclover.id
+
+Harusnya muncul: 43.228.213.128
+
+
+STEP 3: INSTALL SSL CERTIFICATE
+-----------------------------------------------------------------
+certbot --nginx -d api.4leafclover.id --non-interactive --agree-tos --email admin@4leafclover.id
+
+Tunggu proses selesai (sekitar 30 detik - 1 menit)
+
+
+STEP 4: TEST HTTPS
+-----------------------------------------------------------------
+# Test dari VPS
+curl https://api.4leafclover.id/health
+
+# Harusnya muncul:
+# {"status":"OK","message":"Portfolio CMS API is running"}
+
+
+STEP 5: CEK SSL CERTIFICATE
+-----------------------------------------------------------------
+certbot certificates
+
+# Harusnya muncul info certificate untuk api.4leafclover.id
+
+
+=================================================================
+✅ JIKA BERHASIL
+=================================================================
+
+Setelah SSL terinstall, beritahu saya dan saya akan:
+1. Update netlify.toml dari HTTP ke HTTPS
+2. Build dan deploy frontend
+3. Website akan 100% berfungsi tanpa Mixed Content Error!
+
+
+=================================================================
+❌ JIKA GAGAL
+=================================================================
+
+Kirim error message ke saya, kemungkinan masalah:
+
+1. Port 80/443 tidak terbuka:
+   ufw allow 80/tcp
+   ufw allow 443/tcp
+   ufw reload
+
+2. Nginx tidak running:
+   systemctl status nginx
+   systemctl restart nginx
+
+3. DNS belum propagate di VPS:
+   nslookup api.4leafclover.id
+   (tunggu beberapa menit dan coba lagi)
+
+
+=================================================================
+📋 QUICK REFERENCE
+=================================================================
+
+# Install SSL
+certbot --nginx -d api.4leafclover.id --non-interactive --agree-tos --email admin@4leafclover.id
+
+# Test HTTPS
+curl https://api.4leafclover.id/health
+
+# Cek certificate
+certbot certificates
+
+# Cek Nginx config
+cat /etc/nginx/sites-enabled/api.4leafclover.id
+
+# Restart Nginx (jika perlu)
+systemctl restart nginx
+
+=================================================================
