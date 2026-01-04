@@ -1,0 +1,65 @@
+=================================================================
+🧪 TEST NGINX DI VPS
+=================================================================
+
+Jalankan perintah ini di VPS untuk memastikan semuanya berfungsi:
+
+1. CEK STATUS NGINX
+-----------------------------------------------------------------
+systemctl status nginx
+
+Harusnya muncul: "active (running)"
+
+
+2. CEK BACKEND LANGSUNG
+-----------------------------------------------------------------
+curl http://localhost:5000/health
+
+Harusnya muncul: {"status":"OK","message":"Portfolio CMS API is running"}
+
+
+3. CEK NGINX PROXY (VIA IP)
+-----------------------------------------------------------------
+curl http://43.228.213.128/health
+
+Harusnya muncul: {"status":"OK","message":"Portfolio CMS API is running"}
+
+
+4. CEK KONFIGURASI NGINX
+-----------------------------------------------------------------
+cat /etc/nginx/sites-enabled/api.4leafclover.id
+
+Harusnya ada konfigurasi proxy_pass ke localhost:5000
+
+
+5. CEK NGINX ERROR LOG (JIKA ADA MASALAH)
+-----------------------------------------------------------------
+tail -f /var/log/nginx/error.log
+
+
+6. CEK DNS (DARI VPS)
+-----------------------------------------------------------------
+nslookup api.4leafclover.id
+
+Jika DNS sudah propagate, akan muncul IP: 43.228.213.128
+
+
+7. TEST HTTP VIA DOMAIN (SETELAH DNS READY)
+-----------------------------------------------------------------
+curl http://api.4leafclover.id/health
+
+Harusnya muncul: {"status":"OK","message":"Portfolio CMS API is running"}
+
+
+=================================================================
+📋 HASIL YANG DIHARAPKAN
+=================================================================
+
+✅ Nginx running
+✅ Backend bisa diakses via localhost:5000
+✅ Backend bisa diakses via IP (43.228.213.128)
+⏳ DNS masih propagate (tunggu 30 menit - 2 jam)
+⏳ Setelah DNS ready, bisa akses via domain
+⏳ Setelah DNS ready, install SSL dengan certbot
+
+=================================================================
