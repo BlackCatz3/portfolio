@@ -332,7 +332,7 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                     
                     {/* Skills Tags */}
                     <div className="flex flex-wrap justify-center gap-2">
-                      {(about?.skills || ['React', 'TypeScript', 'Figma']).slice(0, 3).map((skill) => (
+                      {(about?.skills || ['React', 'TypeScript', 'Figma']).map((skill) => (
                         <span
                           key={skill}
                           className="px-4 py-1.5 text-xs font-semibold rounded-full bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm"

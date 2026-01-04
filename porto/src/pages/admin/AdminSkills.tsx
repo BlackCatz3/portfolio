@@ -120,9 +120,9 @@ export const AdminSkills = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-heading font-bold">Skills Management</h1>
+          <h1 className="text-3xl font-heading font-bold">Tech Stack Management</h1>
           <p className="text-muted-foreground">
-            Manage your technical skills and proficiency levels
+            Manage your technical skills with proficiency levels (displayed in About section)
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -214,6 +214,19 @@ export const AdminSkills = () => {
             </form>
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* Info Box */}
+      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+        <p className="text-sm font-medium text-blue-500 mb-2">
+          ℹ️ Tech Stack vs Skills Badge:
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• <strong>Tech Stack</strong> (here) - Detailed skills with progress bars displayed in <strong>About section</strong></li>
+          <li>• <strong>Skills Badge</strong> (Admin > Home) - Simple badge pills in nametag card on <strong>Home section</strong></li>
+          <li>• These are <strong>completely separate</strong> - changes here won't affect Skills Badge and vice versa</li>
+          <li>• Use this page to showcase your technical proficiency with percentage levels</li>
+        </ul>
       </div>
 
       {/* Skills List with Progress Bars */}

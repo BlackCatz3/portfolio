@@ -224,7 +224,7 @@ export const AdminHome = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Skills displayed as badges in nametag card (first 3 will be shown)
+                  Skills displayed as badges in nametag card (all skills will be shown)
                 </p>
                 {homeData.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -341,14 +341,25 @@ export const AdminHome = () => {
           💡 What's displayed in Home Section:
         </p>
         <ul className="text-sm text-muted-foreground space-y-1">
+          <li>• <strong>Name</strong> - Your full name in nametag card</li>
           <li>• <strong>Title</strong> - Badge and nametag card</li>
           <li>• <strong>Headline</strong> - Large text in center</li>
           <li>• <strong>Bio</strong> - Description below headline</li>
-          <li>• <strong>Skills</strong> - Badge pills in nametag card (max 3)</li>
+          <li>• <strong>Skills Badge</strong> - Badge pills in nametag card (all will be shown)</li>
           <li>• <strong>Availability Status</strong> - Status text below photo</li>
           <li>• <strong>Profile Image</strong> - Photo in nametag card</li>
           <li>• <strong>Resume URL</strong> - Download CV button</li>
         </ul>
+        <div className="mt-4 pt-4 border-t border-blue-500/20">
+          <p className="text-sm font-medium text-blue-500 mb-2">
+            ℹ️ Skills Badge vs Tech Stack:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• <strong>Skills Badge</strong> (here) - Simple badges in nametag card on Home section</li>
+            <li>• <strong>Tech Stack</strong> (Admin > Skills) - Detailed skills with progress bars in About section</li>
+            <li>• These are <strong>separate</strong> - edit each one independently!</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
