@@ -223,7 +223,7 @@ export const AdminSkills = () => {
         </p>
         <ul className="text-sm text-muted-foreground space-y-1">
           <li>• <strong>Tech Stack</strong> (here) - Detailed skills with progress bars displayed in <strong>About section</strong></li>
-          <li>• <strong>Skills Badge</strong> (Admin > Home) - Simple badge pills in nametag card on <strong>Home section</strong></li>
+          <li>• <strong>Skills Badge</strong> (Admin {'->'} Home) - Simple badge pills in nametag card on <strong>Home section</strong></li>
           <li>• These are <strong>completely separate</strong> - changes here won't affect Skills Badge and vice versa</li>
           <li>• Use this page to showcase your technical proficiency with percentage levels</li>
         </ul>

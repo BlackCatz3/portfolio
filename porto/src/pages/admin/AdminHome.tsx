@@ -356,7 +356,7 @@ export const AdminHome = () => {
           </p>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• <strong>Skills Badge</strong> (here) - Simple badges in nametag card on Home section</li>
-            <li>• <strong>Tech Stack</strong> (Admin > Skills) - Detailed skills with progress bars in About section</li>
+            <li>• <strong>Tech Stack</strong> (Admin {'->'} Skills) - Detailed skills with progress bars in About section</li>
             <li>• These are <strong>separate</strong> - edit each one independently!</li>
           </ul>
         </div>
