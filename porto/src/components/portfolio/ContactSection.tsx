@@ -167,11 +167,11 @@ export const ContactSection = () => {
     setIsSubmitting(true);
     
     try {
-      // Execute invisible reCAPTCHA
-      const recaptchaToken = await recaptchaRef.current?.executeAsync();
+      // Get reCAPTCHA token from checkbox
+      const recaptchaToken = recaptchaRef.current?.getValue();
       
       if (!recaptchaToken) {
-        toast.error("reCAPTCHA verification failed. Please try again.");
+        toast.error("Please complete the reCAPTCHA verification");
         setIsSubmitting(false);
         return;
       }
@@ -340,11 +340,11 @@ export const ContactSection = () => {
                   </div>
                 </div>
                 
-                {/* reCAPTCHA Invisible */}
+                {/* reCAPTCHA Checkbox */}
                 <ReCAPTCHA
                   ref={recaptchaRef}
                   sitekey={RECAPTCHA_SITE_KEY}
-                  size="invisible"
+                  size="normal"
                 />
                 
                 <Button
