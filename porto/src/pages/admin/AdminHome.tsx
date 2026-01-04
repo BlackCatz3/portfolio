@@ -258,10 +258,20 @@ export const AdminHome = () => {
                 />
                 {homeData.profile_image && (
                   <div className="mt-4">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Image URL: {`${getUploadBaseURL()}${homeData.profile_image}`}
+                    </p>
                     <img
                       src={`${getUploadBaseURL()}${homeData.profile_image}`}
                       alt="Profile"
                       className="w-32 h-32 object-cover rounded-full border-4 border-primary/20"
+                      onError={(e) => {
+                        console.error('Image failed to load:', e);
+                        console.error('Image URL:', `${getUploadBaseURL()}${homeData.profile_image}`);
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', `${getUploadBaseURL()}${homeData.profile_image}`);
+                      }}
                     />
                   </div>
                 )}
