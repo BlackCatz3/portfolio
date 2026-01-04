@@ -46,7 +46,7 @@ services:
     networks:
       - portfolio-network
     volumes:
-      - ./backend/uploads:/app/uploads
+      - /var/www/uploads:/var/www/uploads
 
 volumes:
   postgres_data:
