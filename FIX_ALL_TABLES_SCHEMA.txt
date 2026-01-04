@@ -1,0 +1,15 @@
+-- Comprehensive fix for all database tables
+-- Run this on VPS to fix all schema mismatches
+
+-- Fix contact table: rename address to location, add social media columns
+ALTER TABLE contact 
+  RENAME COLUMN address TO location;
+
+ALTER TABLE contact 
+  ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS github_url VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS twitter_url VARCHAR(255);
+
+-- Verify changes
+SELECT * FROM contact;
+SELECT * FROM about_info;
