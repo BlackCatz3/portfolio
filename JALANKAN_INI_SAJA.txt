@@ -1,0 +1,205 @@
+=================================================================
+🚀 FIX UPLOAD GAMBAR - COPY PASTE SCRIPT INI SAJA
+=================================================================
+
+## MASALAH:
+Docker volume mismatch - file tersimpan di container tapi tidak 
+muncul di host, sehingga Nginx tidak bisa serve file.
+
+## SOLUSI:
+Script lengkap di bawah akan fix semua masalah sekaligus:
+1. Pull latest code dari GitHub
+2. Buat folder /var/www/uploads
+3. Restart Docker dengan volume mount yang benar
+4. Update Nginx dengan CORS headers
+5. Test semua berjalan dengan baik
+
+=================================================================
+📋 COPY PASTE SCRIPT INI KE TERMINAL
+=================================================================
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+echo "=========================================="
+echo "🚀 FIX UPLOAD GAMBAR - START"
+echo "=========================================="
+echo ""
+
+# Step 1: Pull latest code
+echo "Step 1: Pull latest code dari GitHub..."
+cd /root/n8n-production/portfolio
+git pull origin main
+echo "✅ Code updated"
+echo ""
+
+# Step 2: Buat folder uploads di host
+echo "Step 2: Buat folder /var/www/uploads..."
+mkdir -p /var/www/uploads
+chmod 755 /var/www/uploads
+echo "✅ Folder created"
+echo ""
+
+# Step 3: Stop containers
+echo "Step 3: Stop Docker containers..."
+cd /root/n8n-production/portfolio/backend
+docker-compose down
+echo "✅ Containers stopped"
+echo ""
+
+# Step 4: Start ulang dengan volume baru
+echo "Step 4: Start containers dengan volume mount baru..."
+docker-compose up -d
+echo "✅ Containers started"
+echo ""
+
+# Step 5: Tunggu backend ready
+echo "Step 5: Tunggu backend ready..."
+sleep 15
+echo "✅ Backend should be ready"
+echo ""
+
+# Step 6: Verify volume mount
+echo "Step 6: Verify volume mount..."
+docker exec portfolio-backend ls -la /var/www/uploads/ 2>/dev/null && echo "✅ Volume mounted successfully" || echo "⚠️ Volume mount check failed"
+echo ""
+
+# Step 7: Update Nginx dengan CORS
+echo "Step 7: Update Nginx config dengan CORS headers..."
+cat > /etc/nginx/sites-available/api.4leafclover.id << 'EOFNGINX'
+server {
+    server_name api.4leafclover.id;
+    client_max_body_size 50M;
+
+    # Serve static uploads with CORS
+    location /uploads/ {
+        alias /var/www/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization' always;
+        
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        
+        access_log off;
+    }
+
+    # Proxy API requests
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/api.4leafclover.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.4leafclover.id/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = api.4leafclover.id) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name api.4leafclover.id;
+    return 404;
+}
+EOFNGINX
+
+echo "✅ Nginx config updated"
+echo ""
+
+# Step 8: Test dan reload Nginx
+echo "Step 8: Test dan reload Nginx..."
+nginx -t
+if [ $? -eq 0 ]; then
+    systemctl reload nginx
+    echo "✅ Nginx reloaded successfully"
+else
+    echo "❌ Nginx config test failed!"
+    exit 1
+fi
+echo ""
+
+# Step 9: Check backend logs
+echo "Step 9: Check backend logs (last 20 lines)..."
+docker-compose logs --tail=20 backend
+echo ""
+
+# Step 10: Final checks
+echo "=========================================="
+echo "✅ DEPLOYMENT SELESAI!"
+echo "=========================================="
+echo ""
+echo "Struktur sekarang:"
+echo "Backend save → /var/www/uploads/ (container)"
+echo "              ↓ (volume mount)"
+echo "Host        → /var/www/uploads/ (shared!)"
+echo "              ↓"
+echo "Nginx serve → /var/www/uploads/ (accessible!)"
+echo ""
+echo "=========================================="
+echo "🎯 LANGKAH SELANJUTNYA:"
+echo "=========================================="
+echo "1. Buka https://4leafclover.id/admin/home"
+echo "2. Upload gambar BARU (jangan pakai yang lama!)"
+echo "3. Klik 'Save Media'"
+echo "4. Refresh halaman (Ctrl + F5)"
+echo "5. Gambar seharusnya LANGSUNG MUNCUL! 🎉"
+echo ""
+echo "⚠️ CATATAN:"
+echo "- Gambar LAMA tidak akan muncul (masih di lokasi lama)"
+echo "- Gambar BARU akan langsung muncul (tersimpan di lokasi benar)"
+echo "- CORS headers sudah ditambahkan"
+echo "- Semua upload setelah ini akan bekerja sempurna"
+echo ""
+
+ENDSSH
+
+=================================================================
+🔍 TROUBLESHOOTING (Jika masih ada masalah)
+=================================================================
+
+Jika setelah menjalankan script di atas masih ada masalah, 
+jalankan perintah ini untuk debug:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+echo "=== Debug Info ==="
+echo ""
+echo "1. Check files in host:"
+ls -la /var/www/uploads/
+echo ""
+echo "2. Check files in container:"
+docker exec portfolio-backend ls -la /var/www/uploads/
+echo ""
+echo "3. Check backend logs:"
+docker logs portfolio-backend --tail=30
+echo ""
+echo "4. Check Nginx error log:"
+tail -20 /var/log/nginx/error.log
+
+ENDSSH
+
+=================================================================
+📞 JIKA BUTUH BANTUAN
+=================================================================
+
+Kirim output dari script troubleshooting di atas untuk analisa lebih lanjut.
+
+=================================================================

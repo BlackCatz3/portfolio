@@ -1,0 +1,59 @@
+=================================================================
+🔍 DEBUG UPLOAD ISSUE - Comprehensive Check
+=================================================================
+
+Jalankan script ini untuk cek semua aspek upload system:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+echo "=========================================="
+echo "1. CEK BACKEND CONTAINER UPLOADS DIRECTORY"
+echo "=========================================="
+docker exec portfolio-backend ls -la /var/www/uploads/ 2>/dev/null || echo "❌ Directory tidak ada di container"
+
+echo ""
+echo "=========================================="
+echo "2. CEK HOST UPLOADS DIRECTORY"
+echo "=========================================="
+ls -la /var/www/uploads/ 2>/dev/null || echo "❌ Directory tidak ada di host"
+
+echo ""
+echo "=========================================="
+echo "3. CEK DOCKER VOLUME MOUNTS"
+echo "=========================================="
+docker inspect portfolio-backend | grep -A 10 "Mounts"
+
+echo ""
+echo "=========================================="
+echo "4. CEK NGINX CONFIG"
+echo "=========================================="
+cat /etc/nginx/sites-available/api.4leafclover.id | grep -A 15 "location /uploads"
+
+echo ""
+echo "=========================================="
+echo "5. TEST AKSES FILE DARI CONTAINER"
+echo "=========================================="
+LATEST_FILE=$(docker exec portfolio-backend ls -t /var/www/uploads/*.jpg 2>/dev/null | head -1)
+if [ ! -z "$LATEST_FILE" ]; then
+    echo "Latest file in container: $LATEST_FILE"
+    FILENAME=$(basename "$LATEST_FILE")
+    echo "Testing: https://api.4leafclover.id/uploads/$FILENAME"
+    curl -I "https://api.4leafclover.id/uploads/$FILENAME"
+else
+    echo "❌ No files in container /var/www/uploads/"
+fi
+
+echo ""
+echo "=========================================="
+echo "6. CEK BACKEND UPLOAD CONFIG"
+echo "=========================================="
+docker exec portfolio-backend cat /app/src/middleware/upload.js | grep -A 3 "uploadsDir"
+
+echo ""
+echo "=========================================="
+echo "7. CEK DOCKER-COMPOSE VOLUMES"
+echo "=========================================="
+cd /root/n8n-production/portfolio/backend
+cat docker-compose.yml | grep -A 5 "volumes"
+
+ENDSSH

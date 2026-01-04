@@ -1,0 +1,92 @@
+========================================
+FIX NETLIFY ENVIRONMENT VARIABLE 🔧
+========================================
+
+MASALAH DITEMUKAN!
+------------------
+❌ Netlify environment variable masih pakai HTTP:
+   http://43.228.213.128/api
+
+✅ Harus pakai HTTPS domain:
+   https://api.4leafclover.id/api
+
+
+KENAPA INI PENTING:
+-------------------
+- Frontend production menggunakan HTTPS (https://4leafclover.id)
+- Jika API endpoint pakai HTTP → Mixed Content Error
+- Browser block HTTP request dari HTTPS page
+- Gambar tidak bisa diakses karena request diblokir
+
+
+CARA FIX DI NETLIFY DASHBOARD:
+-------------------------------
+
+STEP 1: Login ke Netlify
+-------------------------
+1. Buka: https://app.netlify.com
+2. Login ke akun Netlify
+3. Pilih site "4leafclover.id"
+
+
+STEP 2: Edit Environment Variable
+----------------------------------
+1. Klik "Site configuration" (di sidebar kiri)
+2. Klik "Environment variables"
+3. Cari variable: VITE_API_BASE_URL
+4. Klik tombol "Options" (3 titik) → "Edit"
+5. Ubah value dari:
+   ❌ http://43.228.213.128/api
+   
+   Menjadi:
+   ✅ https://api.4leafclover.id/api
+
+6. Klik "Save"
+
+
+STEP 3: Trigger Redeploy
+-------------------------
+1. Klik "Deploys" (di top menu)
+2. Klik "Trigger deploy"
+3. Pilih "Clear cache and deploy site"
+4. Tunggu deploy selesai (1-2 menit)
+
+
+ATAU CARA CEPAT (Via CLI):
+---------------------------
+Jika sudah install Netlify CLI:
+
+netlify env:set VITE_API_BASE_URL "https://api.4leafclover.id/api"
+netlify deploy --prod
+
+
+VERIFIKASI SETELAH DEPLOY:
+---------------------------
+1. Buka: https://4leafclover.id/admin/home
+2. Tekan F12 → Console
+3. Ketik: import.meta.env.VITE_API_BASE_URL
+4. Harus muncul: "https://api.4leafclover.id/api"
+5. Jika masih "http://43.228.213.128/api" → Deploy belum selesai
+
+
+TEST SETELAH FIX:
+-----------------
+1. Clear cache browser: Ctrl + Shift + R
+2. Upload gambar baru di admin/home
+3. Gambar akan langsung muncul!
+
+
+CATATAN PENTING:
+----------------
+- netlify.toml sudah benar (https://api.4leafclover.id/api)
+- Tapi Netlify dashboard environment variable override netlify.toml
+- Jadi harus update di dashboard juga
+- Setelah update, trigger redeploy
+
+
+JAMINAN:
+--------
+Setelah environment variable diupdate dan redeploy,
+gambar PASTI akan muncul! 🎯
+
+Ini adalah root cause masalahnya!

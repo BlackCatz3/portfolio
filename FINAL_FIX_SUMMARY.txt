@@ -1,0 +1,158 @@
+=================================================================
+🎯 FINAL FIX SUMMARY - Root Cause Found!
+=================================================================
+
+## ROOT CAUSE YANG DITEMUKAN:
+
+**Docker Volume Mismatch!**
+
+```
+docker-compose.yml:  ./backend/uploads:/app/uploads     ❌ SALAH!
+Backend code:        save ke /var/www/uploads/          ✅ BENAR
+Nginx:               serve dari /var/www/uploads/       ✅ BENAR
+```
+
+**Akibatnya:**
+- Backend save file ke /var/www/uploads/ (di dalam container)
+- Docker mount ./backend/uploads ke /app/uploads (bukan /var/www/uploads!)
+- File tersimpan di container tapi TIDAK muncul di host
+- Nginx tidak bisa akses file karena tidak ada di host /var/www/uploads/
+- Result: 404 Not Found + CORS Error
+
+=================================================================
+✅ SOLUSI YANG SUDAH DITERAPKAN
+=================================================================
+
+1. ✅ Update docker-compose.yml:
+   - SEBELUM: ./backend/uploads:/app/uploads
+   - SESUDAH: /var/www/uploads:/var/www/uploads
+
+2. ✅ Code sudah di-commit dan push ke GitHub (commit 73ef92a)
+
+3. ✅ Script deployment sudah siap di DEPLOY_VOLUME_FIX.txt
+
+=================================================================
+🚀 LANGKAH SELANJUTNYA - DEPLOY KE VPS
+=================================================================
+
+Copy-paste perintah ini ke terminal (satu per satu):
+
+```bash
+ssh root@43.228.213.128
+```
+
+Kemudian jalankan:
+
+```bash
+cd /root/n8n-production/portfolio && \
+git pull origin main && \
+mkdir -p /var/www/uploads && \
+chmod 755 /var/www/uploads && \
+cd backend && \
+docker-compose down && \
+docker-compose up -d && \
+sleep 15 && \
+docker-compose logs --tail=30 backend
+```
+
+Lalu update Nginx:
+
+```bash
+cat > /etc/nginx/sites-available/api.4leafclover.id << 'EOF'
+server {
+    server_name api.4leafclover.id;
+    client_max_body_size 50M;
+
+    location /uploads/ {
+        alias /var/www/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization' always;
+        
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        
+        access_log off;
+    }
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/api.4leafclover.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.4leafclover.id/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = api.4leafclover.id) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name api.4leafclover.id;
+    return 404;
+}
+EOF
+
+nginx -t && systemctl reload nginx
+```
+
+=================================================================
+🎯 TEST SETELAH DEPLOYMENT
+=================================================================
+
+1. Buka https://4leafclover.id/admin/home
+2. Upload gambar BARU (jangan pakai yang lama!)
+3. Klik "Save Media"
+4. Refresh halaman (Ctrl + F5)
+5. Gambar seharusnya LANGSUNG MUNCUL! ✅
+
+=================================================================
+📊 PENJELASAN VISUAL
+=================================================================
+
+**SEBELUM (BROKEN):**
+```
+Backend → /var/www/uploads/image.jpg (container)
+          ❌ NO MOUNT
+Host    → /var/www/uploads/ (EMPTY!)
+Nginx   → 404 Not Found
+```
+
+**SESUDAH (FIXED):**
+```
+Backend → /var/www/uploads/image.jpg (container)
+          ✅ VOLUME MOUNT
+Host    → /var/www/uploads/image.jpg (SHARED!)
+Nginx   → 200 OK + CORS headers
+Browser → Image displayed! 🎉
+```
+
+=================================================================
+⚠️ PENTING
+=================================================================
+
+- Gambar LAMA tidak akan muncul (masih di lokasi lama)
+- Gambar BARU akan langsung muncul (tersimpan di lokasi benar)
+- Setelah fix ini, semua upload akan bekerja dengan sempurna
+- CORS headers sudah ditambahkan untuk menghindari browser blocking
+
+=================================================================

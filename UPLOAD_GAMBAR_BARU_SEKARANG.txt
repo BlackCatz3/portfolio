@@ -1,0 +1,72 @@
+=================================================================
+🎉 BACKEND SUDAH SIAP! UPLOAD GAMBAR BARU SEKARANG!
+=================================================================
+
+## ✅ SEMUA SUDAH FIX:
+1. ✅ Backend code sudah benar (/var/www/uploads)
+2. ✅ Volume mount sudah bekerja
+3. ✅ Nginx config sudah benar + CORS
+4. ✅ Database connection OK
+5. ✅ Container running dengan baik
+
+## 🎯 SEKARANG UPLOAD GAMBAR BARU:
+
+### LANGKAH-LANGKAH:
+
+1. **Buka browser INCOGNITO** (Ctrl + Shift + N)
+   - Ini penting untuk clear cache!
+
+2. **Login ke admin:**
+   https://4leafclover.id/admin/login
+
+3. **Masuk ke Home section:**
+   https://4leafclover.id/admin/home
+
+4. **Upload gambar BARU:**
+   - Klik "Choose File"
+   - Pilih gambar BARU (yang belum pernah di-upload!)
+   - Klik "Save Media"
+   - Tunggu sampai muncul notifikasi "Success"
+
+5. **Hard refresh:**
+   - Tekan Ctrl + Shift + R
+   - Atau Ctrl + F5
+
+6. **Gambar akan LANGSUNG MUNCUL!** 🎉
+
+=================================================================
+⚠️ PENTING:
+=================================================================
+
+- Gambar LAMA tidak akan muncul (masih di lokasi lama)
+- Gambar BARU akan langsung muncul (tersimpan di lokasi benar)
+- HARUS pakai Incognito mode (untuk clear cache)
+- HARUS hard refresh setelah upload
+
+=================================================================
+🔍 JIKA MASIH TIDAK MUNCUL:
+=================================================================
+
+Buka browser console (F12 → Console) dan jalankan:
+
+```javascript
+fetch('https://api.4leafclover.id/api/about', {
+  headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+})
+.then(r => r.json())
+.then(data => {
+  console.log('Profile Image:', data.profile_image);
+  console.log('Full URL:', 'https://api.4leafclover.id' + data.profile_image);
+  
+  // Test akses gambar
+  fetch('https://api.4leafclover.id' + data.profile_image)
+    .then(r => console.log('Image Status:', r.status, r.statusText))
+    .catch(e => console.error('Error:', e));
+});
+```
+
+Harusnya dapat: "Image Status: 200 OK"
+
+Kirim screenshot console ke saya jika masih ada masalah!
+
+=================================================================

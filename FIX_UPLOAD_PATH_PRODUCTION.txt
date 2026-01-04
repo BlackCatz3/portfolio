@@ -23,7 +23,7 @@ git push origin main
 ssh root@43.228.213.128
 
 # Masuk ke direktori backend
-cd /root/backend
+cd /root/n8n-production/portfolio/backend
 
 # Pull perubahan terbaru
 git pull origin main

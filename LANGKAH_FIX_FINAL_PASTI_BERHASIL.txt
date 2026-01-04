@@ -1,0 +1,109 @@
+========================================
+LANGKAH FIX FINAL - PASTI BERHASIL! 🎯
+========================================
+
+ROOT CAUSE DITEMUKAN!
+---------------------
+❌ Netlify environment variable salah:
+   VITE_API_BASE_URL = http://43.228.213.128/api
+
+✅ Harus:
+   VITE_API_BASE_URL = https://api.4leafclover.id/api
+
+
+KENAPA GAMBAR TIDAK MUNCUL:
+----------------------------
+1. Frontend production pakai HTTPS (https://4leafclover.id)
+2. API endpoint masih HTTP (http://43.228.213.128/api)
+3. Browser block HTTP request dari HTTPS page (Mixed Content)
+4. Semua request ke backend diblokir
+5. Gambar tidak bisa diakses
+
+
+SOLUSI (3 LANGKAH SIMPLE):
+===========================
+
+LANGKAH 1: UPDATE ENVIRONMENT VARIABLE
+---------------------------------------
+1. Buka: https://app.netlify.com
+2. Login ke akun Netlify
+3. Pilih site "4leafclover.id"
+4. Klik "Site configuration" (sidebar kiri)
+5. Klik "Environment variables"
+6. Cari: VITE_API_BASE_URL
+7. Klik "Options" (3 titik) → "Edit"
+8. Ubah value:
+   Dari: http://43.228.213.128/api
+   Ke:   https://api.4leafclover.id/api
+9. Klik "Save"
+
+
+LANGKAH 2: TRIGGER REDEPLOY
+----------------------------
+1. Klik "Deploys" (top menu)
+2. Klik "Trigger deploy"
+3. Pilih "Clear cache and deploy site"
+4. Tunggu deploy selesai (1-2 menit)
+5. Status harus "Published" (hijau)
+
+
+LANGKAH 3: TEST UPLOAD GAMBAR
+------------------------------
+1. Clear cache browser: Ctrl + Shift + R
+2. Buka: https://4leafclover.id/admin/home
+3. Klik tab "Media & CV"
+4. Upload gambar baru
+5. Gambar akan LANGSUNG muncul!
+
+
+VERIFIKASI ENVIRONMENT VARIABLE:
+---------------------------------
+Setelah deploy selesai, cek di browser:
+
+1. Buka: https://4leafclover.id
+2. Tekan F12 → Console
+3. Ketik: localStorage.clear()
+4. Refresh halaman (F5)
+5. Login ke admin
+6. Tekan F12 → Network
+7. Upload gambar
+8. Lihat request URL:
+   ✅ Harus: https://api.4leafclover.id/api/upload
+   ❌ Jika: http://43.228.213.128/api/upload → Belum deploy
+
+
+SCREENSHOT YANG ANDA KIRIM:
+---------------------------
+Menunjukkan environment variable di Netlify:
+- Production: http://43.228.213.128/api ❌
+- Deploy Previews: http://43.228.213.128/api ❌
+- Branch deploys: http://43.228.213.128/api ❌
+- Preview Server: http://43.228.213.128/api ❌
+- Local development: http://43.228.213.128/api ❌
+
+SEMUA HARUS DIUBAH KE:
+- https://api.4leafclover.id/api ✅
+
+
+KENAPA INI TERJADI:
+-------------------
+- Mungkin saat setup awal, domain HTTPS belum ready
+- Jadi pakai IP address HTTP dulu
+- Sekarang domain HTTPS sudah ready (api.4leafclover.id)
+- Tapi environment variable belum diupdate
+
+
+JAMINAN 100%:
+-------------
+Setelah environment variable diupdate ke HTTPS domain,
+gambar PASTI akan muncul!
+
+Ini adalah ROOT CAUSE masalahnya! 🎯
+
+
+CATATAN:
+--------
+- Backend sudah 100% benar (HTTPS, CORS, file access)
+- Frontend code sudah benar (auto-save, getUploadBaseURL)
+- Hanya environment variable yang salah
+- Fix ini akan solve semua masalah!

@@ -6,6 +6,10 @@
 [build.environment]
   VITE_API_BASE_URL = "https://api.4leafclover.id/api"
 
+# IMPORTANT: Make sure Netlify environment variable is also set to:
+# VITE_API_BASE_URL = https://api.4leafclover.id/api
+# NOT http://43.228.213.128/api
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -1,0 +1,98 @@
+=================================================================
+🔧 FIX ABOUT TABLE - Field Mismatch
+=================================================================
+
+## MASALAH
+Table `about` di database menggunakan field yang salah:
+- Database punya: subtitle, description
+- Controller butuh: headline, bio, skills
+
+Ini menyebabkan error 500 saat save data di Admin Home.
+
+=================================================================
+📝 SOLUSI - Jalankan Script Ini
+=================================================================
+
+Copy-paste perintah ini ke terminal:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+# Drop dan recreate table about dengan struktur yang benar
+cat > /tmp/fix-about-table.sql << 'EOF'
+-- Drop table about (akan dibuat ulang dengan struktur yang benar)
+DROP TABLE IF EXISTS about CASCADE;
+
+-- Create table about dengan struktur yang BENAR
+CREATE TABLE about (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    headline TEXT,
+    bio TEXT,
+    profile_image TEXT,
+    resume_url TEXT,
+    skills TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default data
+INSERT INTO about (title, headline, bio, skills)
+VALUES ('Your Name', 'Your Headline', 'Your bio here', ARRAY[]::TEXT[]);
+
+-- Verify
+SELECT * FROM about;
+EOF
+
+echo "=== Running Fix About Table Script ==="
+docker exec -i postgres-db psql -U postgres -d portfolio_cms_2026 < /tmp/fix-about-table.sql
+
+echo ""
+echo "=== Restart Backend ==="
+cd /root/backend
+docker-compose restart
+
+echo ""
+echo "=== Tunggu 5 detik ==="
+sleep 5
+
+echo ""
+echo "=== Test Endpoint ==="
+echo "GET /api/about:"
+curl -s https://api.4leafclover.id/api/about
+echo ""
+echo ""
+echo "=== SELESAI! ==="
+echo "Sekarang coba save data di Admin Home lagi!"
+
+ENDSSH
+
+
+=================================================================
+✅ HASIL YANG DIHARAPKAN
+=================================================================
+
+Setelah menjalankan script:
+
+1. Table `about` sudah punya field yang benar:
+   - title ✅
+   - headline ✅
+   - bio ✅
+   - profile_image ✅
+   - resume_url ✅
+   - skills ✅
+
+2. GET /api/about → {"id":1,"title":"Your Name",...}
+
+3. Save data di Admin Home → Berhasil tanpa error 500!
+
+=================================================================
+📝 CATATAN
+=================================================================
+
+Ini fix untuk table `about` saja. Table lain (about_info, contact, dll) 
+sudah benar dari script sebelumnya.
+
+Masalahnya adalah saya salah membuat struktur table `about` di script 
+pertama. Sekarang sudah diperbaiki sesuai dengan yang dibutuhkan controller.
+
+=================================================================

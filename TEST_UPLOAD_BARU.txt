@@ -1,0 +1,95 @@
+=================================================================
+🧪 TEST UPLOAD GAMBAR BARU
+=================================================================
+
+## PENTING:
+Gambar LAMA tidak akan muncul karena tersimpan di lokasi lama.
+Kamu HARUS upload gambar BARU untuk test fix ini!
+
+=================================================================
+📋 LANGKAH TEST:
+=================================================================
+
+1. Buka browser INCOGNITO/PRIVATE MODE (penting untuk clear cache!)
+   - Chrome: Ctrl + Shift + N
+   - Firefox: Ctrl + Shift + P
+
+2. Login ke admin:
+   https://4leafclover.id/admin/login
+   
+3. Masuk ke Home section:
+   https://4leafclover.id/admin/home
+
+4. Di bagian "Profile Image":
+   - Klik "Choose File"
+   - Pilih gambar BARU (jangan pakai yang sudah pernah di-upload!)
+   - Klik "Save Media"
+
+5. Tunggu sampai muncul notifikasi "Success"
+
+6. Buka browser console (F12 → Console tab)
+
+7. Jalankan perintah ini di console:
+   ```javascript
+   fetch('https://api.4leafclover.id/api/about', {
+     headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
+   })
+   .then(r => r.json())
+   .then(data => {
+     console.log('Profile Image Path:', data.profile_image);
+     console.log('Full URL:', 'https://api.4leafclover.id' + data.profile_image);
+     
+     // Test akses gambar
+     fetch('https://api.4leafclover.id' + data.profile_image)
+       .then(r => console.log('Image Status:', r.status, r.statusText))
+       .catch(e => console.error('Image Error:', e));
+   });
+   ```
+
+8. Lihat output di console:
+   - Harusnya dapat: "Image Status: 200 OK"
+   - Jika dapat 404: File tidak ada di server
+   - Jika dapat CORS error: Nginx config belum benar
+
+9. Refresh halaman (Ctrl + Shift + R untuk hard refresh)
+
+10. Gambar seharusnya muncul!
+
+=================================================================
+🔍 JIKA MASIH TIDAK MUNCUL:
+=================================================================
+
+Jalankan script debug ini untuk cek status:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+echo "=== CEK FILE TERBARU DI SERVER ==="
+echo ""
+echo "File di host:"
+ls -lth /var/www/uploads/ | head -5
+echo ""
+echo "File di container:"
+docker exec portfolio-backend ls -lth /var/www/uploads/ 2>/dev/null | head -5
+echo ""
+echo "Test akses file terbaru:"
+LATEST=$(ls -t /var/www/uploads/*.jpg 2>/dev/null | head -1)
+if [ ! -z "$LATEST" ]; then
+    FILENAME=$(basename "$LATEST")
+    echo "Testing: https://api.4leafclover.id/uploads/$FILENAME"
+    curl -I "https://api.4leafclover.id/uploads/$FILENAME"
+else
+    echo "❌ Tidak ada file .jpg di /var/www/uploads/"
+fi
+
+ENDSSH
+
+=================================================================
+⚠️ CATATAN PENTING:
+=================================================================
+
+1. HARUS upload gambar BARU (bukan yang lama!)
+2. HARUS pakai Incognito/Private mode (untuk clear cache)
+3. HARUS hard refresh (Ctrl + Shift + R)
+4. Gambar lama TIDAK AKAN MUNCUL (masih di lokasi lama)
+
+=================================================================

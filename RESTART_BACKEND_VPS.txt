@@ -1,0 +1,36 @@
+# RESTART BACKEND DI VPS
+
+Jalankan command ini di VPS:
+
+```bash
+# Pull perubahan terbaru
+cd /root/n8n-production/portfolio/backend && git pull origin main
+
+# Restart backend container
+docker-compose restart backend
+
+# Cek log (tekan Ctrl+C untuk keluar)
+docker-compose logs -f backend
+```
+
+Atau dalam satu baris:
+```bash
+cd /root/n8n-production/portfolio/backend && git pull origin main && docker-compose restart backend && docker-compose logs --tail=50 backend
+```
+
+## Setelah Restart:
+
+1. Buka admin panel: https://4leafclover.id/admin/home
+2. **Upload gambar BARU** (jangan pakai gambar lama)
+3. Klik "Save Media"
+4. Refresh halaman (F5)
+5. Gambar seharusnya muncul! ✅
+
+## Jika Masih Belum Muncul:
+
+Cek apakah file tersimpan di lokasi yang benar:
+```bash
+ls -lh /var/www/uploads/
+```
+
+Seharusnya ada file baru dengan timestamp terbaru.

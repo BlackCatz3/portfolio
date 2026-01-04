@@ -1,0 +1,47 @@
+========================================
+COPY PASTE TEST INI - SUPER SIMPLE! 🚀
+========================================
+
+STEP 1: TEST GAMBAR
+-------------------
+Buka URL ini di browser:
+https://api.4leafclover.id/uploads/1767515119776-599079848.jpg
+
+✅ Gambar muncul? → Backend OK, lanjut Step 2
+❌ Gambar tidak muncul? → Kirim screenshot ke saya
+
+
+STEP 2: CLEAR CACHE
+--------------------
+Di halaman https://4leafclover.id/admin/home
+
+Tekan: Ctrl + Shift + R
+
+Tunggu halaman reload.
+
+
+STEP 3: TEST INCOGNITO
+-----------------------
+1. Tekan: Ctrl + Shift + N (buka Incognito)
+2. Buka: https://4leafclover.id/admin/login
+3. Login: admin@4leafclover.id / YourAdminPassword123!
+4. Klik menu "Home"
+5. Lihat apakah gambar muncul
+
+
+HASIL:
+------
+✅ Gambar muncul di Incognito? 
+   → Masalah cache browser biasa
+   → Solusi: Clear cache di browser normal (Step 2)
+
+❌ Gambar tidak muncul di Incognito?
+   → Kirim screenshot dari:
+     1. Console (F12 → Console)
+     2. Network (F12 → Network → cari gambar)
+
+
+SELESAI! 🎉
+-----------
+Jika masih tidak muncul setelah 3 step di atas,
+kirim screenshot dan saya akan bantu lebih lanjut.

@@ -1,0 +1,59 @@
+ssh root@43.228.213.128 << 'ENDSSH'
+
+echo "=========================================="
+echo "🔍 DEBUG - CEK STATUS SEKARANG"
+echo "=========================================="
+echo ""
+
+echo "1. CEK DOCKER-COMPOSE.YML VOLUME:"
+echo "---"
+cd /root/n8n-production/portfolio/backend
+cat docker-compose.yml | grep -A 2 "volumes:" | grep -v "postgres_data"
+echo ""
+
+echo "2. CEK FILE DI HOST /var/www/uploads:"
+echo "---"
+ls -lah /var/www/uploads/ 2>/dev/null || echo "❌ Folder tidak ada atau kosong"
+echo ""
+
+echo "3. CEK FILE DI CONTAINER /var/www/uploads:"
+echo "---"
+docker exec portfolio-backend ls -lah /var/www/uploads/ 2>/dev/null || echo "❌ Folder tidak ada di container"
+echo ""
+
+echo "4. CEK FILE DI CONTAINER /app/uploads:"
+echo "---"
+docker exec portfolio-backend ls -lah /app/uploads/ 2>/dev/null || echo "❌ Folder tidak ada di container"
+echo ""
+
+echo "5. CEK BACKEND UPLOAD CONFIG:"
+echo "---"
+docker exec portfolio-backend cat /app/src/middleware/upload.js | grep "uploadsDir" -A 1
+echo ""
+
+echo "6. CEK NGINX CONFIG:"
+echo "---"
+cat /etc/nginx/sites-available/api.4leafclover.id | grep "location /uploads" -A 5
+echo ""
+
+echo "7. CEK BACKEND LOGS (last 20 lines):"
+echo "---"
+docker logs portfolio-backend --tail=20
+echo ""
+
+echo "8. CEK NGINX ERROR LOG (last 10 lines):"
+echo "---"
+tail -10 /var/log/nginx/error.log
+echo ""
+
+echo "9. TEST UPLOAD ENDPOINT:"
+echo "---"
+curl -I https://api.4leafclover.id/api/upload
+echo ""
+
+echo "10. CEK DATABASE - PROFILE IMAGE PATH:"
+echo "---"
+docker exec portfolio-db psql -U portfolio_user -d portfolio_cms_2026 -c "SELECT id, title, profile_image FROM about;"
+echo ""
+
+ENDSSH

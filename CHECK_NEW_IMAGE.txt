@@ -1,0 +1,27 @@
+# CEK GAMBAR BARU
+
+Jalankan command ini di VPS untuk cek file gambar terbaru:
+
+```bash
+# Cek apakah file baru ada
+ls -lh /var/www/uploads/1767509842628-531157002.jpg
+
+# Test akses via curl
+curl -I https://api.4leafclover.id/uploads/1767509842628-531157002.jpg
+
+# Cek database lagi
+docker exec -i portfolio-db psql -U portfolio_user -d portfolio_cms_2026 -c "SELECT id, title, profile_image, updated_at FROM about;"
+```
+
+## Kemungkinan Penyebab:
+
+1. **Kamu upload gambar baru** → File baru tersimpan di server tapi belum kita cek
+2. **React state belum refresh** → Setelah upload, state berubah tapi belum di-save ke database
+3. **Database query kita outdated** → Kita cek database sebelum kamu save
+
+## Solusi Cepat:
+
+**Klik tombol "Save Media"** di admin panel untuk memastikan gambar tersimpan ke database!
+
+Atau test URL gambar baru ini di browser:
+https://api.4leafclover.id/uploads/1767509842628-531157002.jpg

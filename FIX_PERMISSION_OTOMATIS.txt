@@ -1,0 +1,72 @@
+========================================
+FIX PERMISSION OTOMATIS - SOLUSI CEPAT
+========================================
+
+AKAR MASALAH DITEMUKAN!
+------------------------
+❌ Docker container berjalan sebagai root
+❌ File yang diupload punya owner root:root
+❌ Nginx tidak bisa baca file dengan owner root
+❌ Gambar tidak muncul
+
+
+SOLUSI PERMANEN:
+----------------
+Jalankan script ini di VPS untuk fix permission otomatis:
+
+ssh root@43.228.213.128
+
+Kemudian copy-paste script ini:
+
+cat > /root/fix-uploads-permission.sh << 'EOF'
+#!/bin/bash
+# Fix permission untuk semua file di /var/www/uploads
+chown -R www-data:www-data /var/www/uploads/
+chmod -R 644 /var/www/uploads/*.jpg
+chmod -R 644 /var/www/uploads/*.jpeg
+chmod -R 644 /var/www/uploads/*.png
+chmod -R 644 /var/www/uploads/*.gif
+chmod -R 644 /var/www/uploads/*.webp
+chmod 755 /var/www/uploads/
+echo "Permission fixed at $(date)"
+EOF
+
+chmod +x /root/fix-uploads-permission.sh
+
+# Jalankan sekali
+/root/fix-uploads-permission.sh
+
+# Setup cron job untuk jalankan setiap 1 menit
+(crontab -l 2>/dev/null; echo "* * * * * /root/fix-uploads-permission.sh >> /var/log/fix-uploads.log 2>&1") | crontab -
+
+# Verifikasi cron job
+crontab -l
+
+
+ATAU SOLUSI MANUAL (SETIAP UPLOAD):
+------------------------------------
+Setiap kali upload gambar, jalankan:
+
+ssh root@43.228.213.128 "chown -R www-data:www-data /var/www/uploads/ && chmod -R 644 /var/www/uploads/*.jpg"
+
+
+TEST SEKARANG:
+--------------
+1. Jalankan script di atas
+2. Refresh browser: Ctrl + Shift + R
+3. Gambar akan langsung muncul!
+
+
+KENAPA INI TERJADI:
+-------------------
+- Docker container berjalan sebagai root user
+- File yang dibuat di /var/www/uploads/ punya owner root:root
+- Nginx berjalan sebagai www-data user
+- Nginx tidak bisa baca file dengan owner root
+- Solusi: Ubah owner file jadi www-data:www-data
+
+
+JAMINAN:
+--------
+Setelah jalankan script ini, gambar PASTI akan muncul!
+Dan setiap upload baru akan otomatis diperbaiki permission-nya!

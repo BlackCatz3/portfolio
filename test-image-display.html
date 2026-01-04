@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        .success { border-color: green; background: #e8f5e9; }
+        .error { border-color: red; background: #ffebee; }
+        img {
+            max-width: 300px;
+            border: 2px solid #333;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Image Display - Debug Tool</h1>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'https://api.4leafclover.id/api';
+        const UPLOAD_BASE = 'https://api.4leafclover.id';
+        
+        async function runAllTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Running tests...</h2>';
+            
+            // Test 1: Fetch API Data
+            await testAPIFetch();
+            
+            // Test 2: Direct Image Load
+            await testDirectImageLoad();
+            
+            // Test 3: CORS Test
+            await testCORS();
+        }
+        
+        async function testAPIFetch() {
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.innerHTML = '<h3>Test 1: API Fetch</h3><p>Fetching data from API...</p>';
+            document.getElementById('results').appendChild(section);
+            
+            try {
+                const response = await fetch(`${API_BASE}/about`);
+                const data = await response.json();
+                
+                section.className = 'test-section success';
+                section.innerHTML = `
+                    <h3>✅ Test 1: API Fetch - SUCCESS</h3>
+                    <p><strong>Profile Image Path:</strong> ${data.profile_image}</p>
+                    <p><strong>Full URL:</strong> ${UPLOAD_BASE}${data.profile_image}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                // Test image display
+                const img = document.createElement('img');
+                img.src = `${UPLOAD_BASE}${data.profile_image}`;
+                img.alt = 'Profile Image';
+                img.onload = () => {
+                    const success = document.createElement('p');
+                    success.innerHTML = '<strong style="color: green;">✅ Image loaded successfully!</strong>';
+                    section.appendChild(success);
+                };
+                img.onerror = () => {
+                    const error = document.createElement('p');
+                    error.innerHTML = '<strong style="color: red;">❌ Image failed to load!</strong>';
+                    section.appendChild(error);
+                };
+                section.appendChild(img);
+                
+            } catch (error) {
+                section.className = 'test-section error';
+                section.innerHTML = `
+                    <h3>❌ Test 1: API Fetch - FAILED</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testDirectImageLoad() {
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.innerHTML = '<h3>Test 2: Direct Image Load</h3><p>Loading image directly...</p>';
+            document.getElementById('results').appendChild(section);
+            
+            // Use the latest image from database
+            const imageUrl = 'https://api.4leafclover.id/uploads/1767516735604-650014329.jpg';
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = 'Direct Load Test';
+            
+            img.onload = () => {
+                section.className = 'test-section success';
+                section.innerHTML = `
+                    <h3>✅ Test 2: Direct Image Load - SUCCESS</h3>
+                    <p><strong>Image URL:</strong> ${imageUrl}</p>
+                    <p><strong>Image Size:</strong> ${img.naturalWidth} x ${img.naturalHeight}</p>
+                `;
+                section.appendChild(img);
+            };
+            
+            img.onerror = () => {
+                section.className = 'test-section error';
+                section.innerHTML = `
+                    <h3>❌ Test 2: Direct Image Load - FAILED</h3>
+                    <p><strong>Image URL:</strong> ${imageUrl}</p>
+                    <p>Image failed to load. Check console for details.</p>
+                `;
+            };
+        }
+        
+        async function testCORS() {
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.innerHTML = '<h3>Test 3: CORS Test</h3><p>Testing CORS headers...</p>';
+            document.getElementById('results').appendChild(section);
+            
+            try {
+                const response = await fetch('https://api.4leafclover.id/uploads/1767516735604-650014329.jpg');
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                section.className = 'test-section success';
+                section.innerHTML = `
+                    <h3>✅ Test 3: CORS Test - SUCCESS</h3>
+                    <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                    <p><strong>CORS Headers:</strong></p>
+                    <pre>${JSON.stringify(headers, null, 2)}</pre>
+                `;
+            } catch (error) {
+                section.className = 'test-section error';
+                section.innerHTML = `
+                    <h3>❌ Test 3: CORS Test - FAILED</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Auto-run on load
+        window.onload = () => {
+            runAllTests();
+        };
+    </script>
+</body>
+</html>

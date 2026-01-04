@@ -1,0 +1,72 @@
+=================================================================
+🔍 CEK KONDISI SERVER - JALANKAN DAN KIRIM OUTPUTNYA
+=================================================================
+
+## CARA PAKAI:
+1. ssh root@43.228.213.128
+2. Masukkan password
+3. Copy paste script di bawah:
+
+=================================================================
+
+cd /root/n8n-production/portfolio/backend
+
+echo "=========================================="
+echo "1. DOCKER-COMPOSE VOLUME CONFIG:"
+echo "=========================================="
+cat docker-compose.yml | grep -A 5 "backend:" | grep -B 2 -A 3 "volumes:"
+echo ""
+
+echo "=========================================="
+echo "2. FILES DI HOST /var/www/uploads:"
+echo "=========================================="
+ls -lah /var/www/uploads/ 2>/dev/null || echo "Folder tidak ada"
+echo ""
+
+echo "=========================================="
+echo "3. FILES DI CONTAINER /var/www/uploads:"
+echo "=========================================="
+docker exec portfolio-backend ls -lah /var/www/uploads/ 2>/dev/null || echo "Folder tidak ada di container"
+echo ""
+
+echo "=========================================="
+echo "4. FILES DI CONTAINER /app/uploads:"
+echo "=========================================="
+docker exec portfolio-backend ls -lah /app/uploads/ 2>/dev/null || echo "Folder tidak ada di container"
+echo ""
+
+echo "=========================================="
+echo "5. BACKEND UPLOAD CONFIG:"
+echo "=========================================="
+docker exec portfolio-backend cat /app/src/middleware/upload.js | head -15
+echo ""
+
+echo "=========================================="
+echo "6. NGINX CONFIG (location /uploads):"
+echo "=========================================="
+cat /etc/nginx/sites-available/api.4leafclover.id | grep -A 10 "location /uploads"
+echo ""
+
+echo "=========================================="
+echo "7. BACKEND CONTAINER STATUS:"
+echo "=========================================="
+docker ps | grep portfolio-backend
+echo ""
+
+echo "=========================================="
+echo "8. BACKEND LOGS (last 15 lines):"
+echo "=========================================="
+docker logs portfolio-backend --tail=15
+echo ""
+
+echo "=========================================="
+echo "9. DATABASE - PROFILE IMAGE PATH:"
+echo "=========================================="
+docker exec portfolio-db psql -U portfolio_user -d portfolio_cms_2026 -c "SELECT id, title, profile_image, updated_at FROM about ORDER BY updated_at DESC LIMIT 1;"
+echo ""
+
+echo "=========================================="
+echo "SELESAI - KIRIM OUTPUT INI KE SAYA"
+echo "=========================================="
+
+=================================================================

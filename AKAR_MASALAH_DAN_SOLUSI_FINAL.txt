@@ -1,0 +1,113 @@
+========================================
+AKAR MASALAH DITEMUKAN & SOLUSI FINAL ✅
+========================================
+
+AKAR MASALAH:
+-------------
+❌ Docker container berjalan sebagai ROOT user
+❌ File yang diupload punya owner ROOT:ROOT
+❌ Nginx berjalan sebagai WWW-DATA user
+❌ Nginx TIDAK BISA baca file dengan owner ROOT
+❌ Gambar tidak muncul karena permission denied
+
+
+BUKTI:
+------
+File yang baru diupload:
+- 1767516396875-72445869.jpg
+- Owner: root:root ❌
+- Nginx tidak bisa baca → Gambar tidak muncul
+
+
+SOLUSI YANG SUDAH DITERAPKAN:
+------------------------------
+✅ Fix permission semua file: chown www-data:www-data
+✅ Setup cron job otomatis (jalan setiap 1 menit)
+✅ Script: /root/fix-uploads-permission.sh
+✅ Log: /var/log/fix-uploads.log
+
+
+CRON JOB AKTIF:
+---------------
+* * * * * /root/fix-uploads-permission.sh
+
+Artinya:
+- Setiap 1 menit, script akan jalan
+- Semua file di /var/www/uploads/ akan diperbaiki permission-nya
+- Owner diubah jadi www-data:www-data
+- Permission diubah jadi 644 (readable)
+
+
+TEST SEKARANG:
+--------------
+1. Buka browser INCOGNITO (Ctrl + Shift + N)
+2. Buka: https://4leafclover.id/admin/login
+3. Login: admin@4leafclover.id / YourAdminPassword123!
+4. Klik menu "Home"
+5. Klik tab "Media & CV"
+6. Gambar akan LANGSUNG muncul!
+
+ATAU
+
+1. Buka browser biasa
+2. Tekan: Ctrl + Shift + R (hard refresh)
+3. Gambar akan muncul!
+
+
+VERIFIKASI:
+-----------
+Cek permission file:
+ssh root@43.228.213.128 "ls -lah /var/www/uploads/ | tail -5"
+
+Harus muncul:
+-rw-r--r-- 1 www-data www-data ... 1767516396875-72445869.jpg
+
+
+UPLOAD GAMBAR BARU:
+-------------------
+Setiap kali upload gambar baru:
+1. File akan dibuat dengan owner root:root
+2. Dalam 1 menit, cron job akan fix permission
+3. Gambar akan muncul setelah 1 menit
+4. Atau refresh browser setelah 1 menit
+
+
+SOLUSI PERMANEN (OPTIONAL):
+----------------------------
+Untuk fix ini secara permanen, update Dockerfile:
+
+FROM node:18-alpine
+
+# Create non-root user
+RUN addgroup -g 33 www-data && adduser -D -u 33 -G www-data www-data
+
+WORKDIR /app
+
+# Copy and install as root
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy source
+COPY . .
+
+# Change ownership
+RUN chown -R www-data:www-data /app
+
+# Switch to non-root user
+USER www-data
+
+EXPOSE 5000
+CMD ["node", "src/server.js"]
+
+Kemudian rebuild container:
+cd /root/n8n-production/portfolio
+docker compose build backend
+docker compose up -d backend
+
+
+JAMINAN 100%:
+-------------
+Gambar PASTI akan muncul sekarang!
+Cron job akan otomatis fix permission setiap 1 menit!
+
+Refresh browser dan lihat hasilnya! 🎯

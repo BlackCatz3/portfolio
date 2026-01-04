@@ -1,0 +1,182 @@
+=================================================================
+🔧 FIX NGINX - Serve Static Uploads Files
+=================================================================
+
+## MASALAH
+Nginx tidak dikonfigurasi untuk serve file uploads. Semua request 
+(termasuk /uploads/) di-proxy ke backend, padahal file gambar 
+seharusnya di-serve langsung oleh Nginx untuk performa lebih baik.
+
+=================================================================
+📝 SOLUSI - Jalankan Script Ini
+=================================================================
+
+Copy-paste perintah ini ke terminal:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+# Backup konfigurasi lama
+cp /etc/nginx/sites-available/api.4leafclover.id /etc/nginx/sites-available/api.4leafclover.id.backup
+
+# Update konfigurasi Nginx
+cat > /etc/nginx/sites-available/api.4leafclover.id << 'EOF'
+server {
+    server_name api.4leafclover.id;
+    client_max_body_size 50M;
+
+    # Serve static uploads files directly
+    location /uploads/ {
+        alias /root/backend/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # Proxy API requests to backend
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/api.4leafclover.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.4leafclover.id/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = api.4leafclover.id) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name api.4leafclover.id;
+    return 404;
+}
+EOF
+
+echo "=== Testing Nginx Configuration ==="
+nginx -t
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "=== Reloading Nginx ==="
+    systemctl reload nginx
+    
+    echo ""
+    echo "=== Creating uploads directory if not exists ==="
+    mkdir -p /root/backend/uploads
+    chmod 755 /root/backend/uploads
+    
+    echo ""
+    echo "=== Listing uploaded files ==="
+    ls -lah /root/backend/uploads/ | head -20
+    
+    echo ""
+    echo "=== Testing uploads access ==="
+    # Get first image file
+    FIRST_IMAGE=$(ls /root/backend/uploads/*.jpg 2>/dev/null | head -1 | xargs basename)
+    if [ ! -z "$FIRST_IMAGE" ]; then
+        echo "Testing: https://api.4leafclover.id/uploads/$FIRST_IMAGE"
+        curl -I "https://api.4leafclover.id/uploads/$FIRST_IMAGE"
+    else
+        echo "No image files found in uploads folder"
+    fi
+    
+    echo ""
+    echo "=== SELESAI! ==="
+    echo "Nginx sudah dikonfigurasi untuk serve uploads!"
+    echo "Refresh browser dan gambar seharusnya muncul!"
+else
+    echo ""
+    echo "=== ERROR: Nginx configuration test failed ==="
+    echo "Restoring backup..."
+    cp /etc/nginx/sites-available/api.4leafclover.id.backup /etc/nginx/sites-available/api.4leafclover.id
+fi
+
+ENDSSH
+
+
+=================================================================
+✅ HASIL YANG DIHARAPKAN
+=================================================================
+
+Setelah menjalankan script:
+
+1. Nginx configuration test: OK ✅
+2. Nginx reloaded: OK ✅
+3. Uploads folder created: OK ✅
+4. Test access uploads: HTTP 200 ✅
+
+Kemudian di browser:
+1. Hard refresh: Ctrl + Shift + R
+2. Gambar seharusnya muncul! ✅
+
+=================================================================
+📝 APA YANG BERUBAH
+=================================================================
+
+**SEBELUM:**
+```nginx
+location / {
+    proxy_pass http://localhost:5000;  # Semua request ke backend
+}
+```
+
+**SESUDAH:**
+```nginx
+# Static files di-serve langsung oleh Nginx (lebih cepat!)
+location /uploads/ {
+    alias /root/backend/uploads/;
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+}
+
+# API requests tetap ke backend
+location / {
+    proxy_pass http://localhost:5000;
+}
+```
+
+**Keuntungan:**
+- ✅ Gambar di-serve langsung oleh Nginx (lebih cepat)
+- ✅ Cache 30 hari (hemat bandwidth)
+- ✅ Backend tidak perlu handle static files
+
+=================================================================
+🔍 TROUBLESHOOTING
+=================================================================
+
+**Jika gambar masih tidak muncul:**
+
+1. Cek file ada di VPS:
+```bash
+ssh root@43.228.213.128
+ls -lah /root/backend/uploads/
+```
+
+2. Cek permission folder:
+```bash
+chmod 755 /root/backend/uploads
+chmod 644 /root/backend/uploads/*
+```
+
+3. Test akses langsung (ganti FILENAME):
+```bash
+curl -I https://api.4leafclover.id/uploads/FILENAME.jpg
+```
+
+4. Cek Nginx error log:
+```bash
+tail -f /var/log/nginx/error.log
+```
+
+=================================================================

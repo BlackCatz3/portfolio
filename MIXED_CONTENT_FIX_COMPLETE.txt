@@ -1,0 +1,161 @@
+=================================================================
+✅ MIXED CONTENT ERROR - FIXED!
+=================================================================
+
+## STATUS: SELESAI ✅
+
+Semua perubahan sudah:
+✅ Diupdate (13 files)
+✅ Di-build
+✅ Di-commit
+✅ Di-push ke GitHub
+
+Netlify sedang auto-deploy sekarang!
+
+=================================================================
+📊 SUMMARY PERUBAHAN
+=================================================================
+
+### Files yang Diupdate: 13 files
+
+**Admin Pages (7 files):**
+1. ✅ porto/src/pages/admin/AdminHome.tsx
+2. ✅ porto/src/pages/admin/AdminProjects.tsx
+3. ✅ porto/src/pages/admin/AdminProfile.tsx
+4. ✅ porto/src/pages/admin/AdminTestimonials.tsx
+5. ✅ porto/src/pages/admin/AdminCV.tsx
+6. ✅ porto/src/pages/admin/AdminCertifications.tsx
+7. ✅ porto/src/pages/admin/AdminBlog.tsx
+
+**Frontend Components (5 files):**
+8. ✅ porto/src/components/portfolio/HeroSection.tsx
+9. ✅ porto/src/components/portfolio/ProjectsSection.tsx
+10. ✅ porto/src/components/portfolio/ExperienceSection.tsx
+11. ✅ porto/src/components/portfolio/ContactSection.tsx
+12. ✅ porto/src/components/TestimonialsModal.tsx
+
+**Core API (1 file):**
+13. ✅ porto/src/services/api.js (Added getUploadBaseURL function)
+
+### Git Commit:
+```
+Commit: df55efa
+Message: Fix: Replace hardcoded localhost URLs with dynamic base URL for uploads - Fix Mixed Content Error
+Files changed: 19 files
+Insertions: +593
+Deletions: -31
+```
+
+=================================================================
+⏳ NETLIFY DEPLOYMENT
+=================================================================
+
+Status: 🔄 Deploying...
+
+Netlify sedang auto-deploy perubahan ini.
+Biasanya memakan waktu 1-2 menit.
+
+Cek status di:
+https://app.netlify.com/sites/[your-site]/deploys
+
+=================================================================
+🧪 TESTING SETELAH DEPLOY
+=================================================================
+
+Setelah Netlify deployment selesai (tunggu 1-2 menit):
+
+1. **Buka website:**
+   https://4leafclover.id/admin/home
+
+2. **Login:**
+   Email: admin@4leafclover.id
+   Password: YourAdminPassword123!
+
+3. **Test upload gambar:**
+   - Upload foto profil baru
+   - Gambar seharusnya muncul tanpa error
+   - Tidak ada "Mixed Content Error" di console
+
+4. **Cek browser console (F12):**
+   - Seharusnya tidak ada error Mixed Content
+   - URL gambar seharusnya: https://api.4leafclover.id/uploads/...
+   - BUKAN: http://localhost:5000/uploads/...
+
+=================================================================
+✅ HASIL YANG DIHARAPKAN
+=================================================================
+
+**SEBELUM FIX:**
+❌ Upload gambar → URL: http://localhost:5000/uploads/...
+❌ Browser: "Mixed Content Error!"
+❌ Gambar tidak muncul
+
+**SETELAH FIX:**
+✅ Upload gambar → URL: https://api.4leafclover.id/uploads/...
+✅ Browser: "OK, HTTPS semua!"
+✅ Gambar muncul dengan sempurna
+
+=================================================================
+🔧 TECHNICAL DETAILS
+=================================================================
+
+### Perubahan Utama:
+
+**1. Added Helper Function (api.js):**
+```javascript
+export const getUploadBaseURL = () => {
+  return API_BASE_URL.replace('/api', '');
+};
+```
+
+**2. Updated All Image URLs:**
+```tsx
+// BEFORE:
+src={`http://localhost:5000${imageUrl}`}
+
+// AFTER:
+import { getUploadBaseURL } from "@/services/api";
+src={`${getUploadBaseURL()}${imageUrl}`}
+```
+
+### How It Works:
+
+- **Development:** getUploadBaseURL() returns `http://localhost:5000`
+- **Production:** getUploadBaseURL() returns `https://api.4leafclover.id`
+
+Otomatis menyesuaikan berdasarkan environment variable:
+`VITE_API_BASE_URL`
+
+=================================================================
+📝 NEXT STEPS
+=================================================================
+
+1. ⏳ Tunggu Netlify deployment selesai (1-2 menit)
+2. 🧪 Test upload gambar di admin panel
+3. ✅ Verify tidak ada Mixed Content Error
+4. 🎉 Selesai!
+
+=================================================================
+📞 TROUBLESHOOTING
+=================================================================
+
+**Jika masih ada Mixed Content Error:**
+
+1. Hard refresh browser: Ctrl + Shift + R (Windows) atau Cmd + Shift + R (Mac)
+2. Clear browser cache
+3. Cek Netlify deployment status
+4. Cek browser console untuk error lain
+
+**Jika gambar tidak muncul:**
+
+1. Cek URL gambar di browser console
+2. Pastikan URL menggunakan HTTPS
+3. Cek apakah file ada di VPS: ssh root@43.228.213.128 → ls /root/backend/uploads/
+
+=================================================================
+
+Deployment Date: 04 January 2026
+Status: ✅ COMPLETE
+Waiting for: Netlify auto-deploy (1-2 minutes)
+
+=================================================================

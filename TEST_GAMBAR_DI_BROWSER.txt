@@ -1,0 +1,93 @@
+========================================
+TEST GAMBAR DI BROWSER - COPY PASTE INI
+========================================
+
+LANGKAH 1: TEST GAMBAR LANGSUNG
+--------------------------------
+Buka URL ini di browser:
+https://api.4leafclover.id/uploads/1767515119776-599079848.jpg
+
+✅ Jika gambar muncul = Backend OK
+❌ Jika tidak muncul = Ada masalah di Nginx
+
+
+LANGKAH 2: TEST API ABOUT
+--------------------------
+Buka URL ini di browser:
+https://api.4leafclover.id/api/about
+
+Cari bagian "profile_image", harus ada:
+"profile_image":"/uploads/1767515119776-599079848.jpg"
+
+✅ Jika ada = Database OK
+❌ Jika tidak ada = Database belum update
+
+
+LANGKAH 3: CLEAR CACHE BROWSER
+-------------------------------
+Di halaman admin (https://4leafclover.id/admin/home):
+
+1. Tekan Ctrl + Shift + Delete
+2. Pilih "Cached images and files"
+3. Pilih "All time"
+4. Klik "Clear data"
+
+ATAU
+
+1. Tekan Ctrl + Shift + R (Hard Refresh)
+2. Atau Ctrl + F5
+
+
+LANGKAH 4: TEST DI INCOGNITO/PRIVATE
+-------------------------------------
+1. Buka browser Incognito/Private mode
+2. Login ke admin: https://4leafclover.id/admin/login
+3. Buka Home section
+4. Lihat apakah gambar muncul
+
+
+LANGKAH 5: CEK CONSOLE BROWSER
+-------------------------------
+1. Tekan F12 untuk buka Developer Tools
+2. Klik tab "Console"
+3. Refresh halaman (F5)
+4. Lihat apakah ada error merah
+5. Screenshot dan kirim ke saya jika ada error
+
+
+LANGKAH 6: CEK NETWORK TAB
+---------------------------
+1. Tekan F12 untuk buka Developer Tools
+2. Klik tab "Network"
+3. Refresh halaman (F5)
+4. Cari request ke "1767515119776-599079848.jpg"
+5. Klik request tersebut
+6. Lihat Status Code (harus 200 OK)
+7. Screenshot dan kirim ke saya jika bukan 200
+
+
+INFORMASI TEKNIS:
+------------------
+✅ Backend: Running (4 minutes uptime)
+✅ Database: Connected
+✅ File exists: /var/www/uploads/1767515119776-599079848.jpg
+✅ File permission: www-data:www-data 644
+✅ Nginx serving: HTTP 200 OK with CORS headers
+✅ Database record: /uploads/1767515119776-599079848.jpg
+✅ API response: Correct path returned
+✅ Frontend code: Using getUploadBaseURL() (commit df55efa)
+✅ Netlify env: VITE_API_BASE_URL = https://api.4leafclover.id/api
+
+KEMUNGKINAN MASALAH:
+--------------------
+1. Browser cache (paling mungkin) → Clear cache atau hard refresh
+2. Netlify belum deploy versi terbaru → Tunggu 1-2 menit
+3. Service Worker cache → Clear site data di browser settings
+
+
+JIKA MASIH TIDAK MUNCUL:
+-------------------------
+Kirim screenshot dari:
+1. Console tab (F12 → Console)
+2. Network tab (F12 → Network → cari file gambar)
+3. Halaman admin yang menunjukkan gambar tidak muncul

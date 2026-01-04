@@ -1,0 +1,199 @@
+=================================================================
+🔧 FIX DOCKER VOLUME - Mount /var/www/uploads dengan Benar
+=================================================================
+
+## ROOT CAUSE:
+Backend menyimpan file ke /var/www/uploads/ DI DALAM CONTAINER.
+Folder ini TIDAK di-mount ke host, sehingga Nginx tidak bisa akses!
+
+## SOLUSI:
+Mount /var/www/uploads dari container ke host menggunakan Docker volume.
+
+=================================================================
+📝 LANGKAH-LANGKAH FIX
+=================================================================
+
+ssh root@43.228.213.128
+
+# Step 1: Masuk ke direktori backend
+cd /root/n8n-production/portfolio/backend
+
+# Step 2: Backup docker-compose.yml
+cp docker-compose.yml docker-compose.yml.backup
+
+# Step 3: Update docker-compose.yml untuk mount uploads volume
+cat > docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  backend:
+    container_name: portfolio-backend
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=portfolio_cms_2026
+      - DB_USER=portfolio_user
+      - DB_PASSWORD=your_secure_password_here
+      - JWT_SECRET=your_jwt_secret_here
+    volumes:
+      - /var/www/uploads:/var/www/uploads
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    container_name: portfolio-db
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=portfolio_cms_2026
+      - POSTGRES_USER=portfolio_user
+      - POSTGRES_PASSWORD=your_secure_password_here
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+EOF
+
+# Step 4: Buat directory /var/www/uploads di host jika belum ada
+mkdir -p /var/www/uploads
+chmod 755 /var/www/uploads
+
+# Step 5: Stop dan remove container lama
+docker-compose down
+
+# Step 6: Start ulang dengan volume baru
+docker-compose up -d
+
+# Step 7: Tunggu backend ready
+echo "Waiting for backend to start..."
+sleep 10
+
+# Step 8: Cek logs
+docker-compose logs --tail=30 backend
+
+# Step 9: Test volume mount
+echo ""
+echo "=========================================="
+echo "CEK VOLUME MOUNT"
+echo "=========================================="
+docker exec portfolio-backend ls -la /var/www/uploads/
+
+# Step 10: Update Nginx config dengan CORS
+cat > /etc/nginx/sites-available/api.4leafclover.id << 'EOFNGINX'
+server {
+    server_name api.4leafclover.id;
+    client_max_body_size 50M;
+
+    # Serve static uploads files directly with CORS
+    location /uploads/ {
+        alias /var/www/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization' always;
+        
+        # Handle preflight
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        
+        access_log off;
+    }
+
+    # Proxy API requests
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/api.4leafclover.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.4leafclover.id/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = api.4leafclover.id) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name api.4leafclover.id;
+    return 404;
+}
+EOFNGINX
+
+# Step 11: Test dan reload Nginx
+nginx -t && systemctl reload nginx
+
+echo ""
+echo "=========================================="
+echo "✅ SELESAI!"
+echo "=========================================="
+echo ""
+echo "Sekarang:"
+echo "1. Buka https://4leafclover.id/admin/home"
+echo "2. Upload gambar BARU"
+echo "3. Klik 'Save Media'"
+echo "4. Refresh halaman"
+echo "5. Gambar seharusnya muncul!"
+echo ""
+echo "File akan tersimpan di:"
+echo "- Container: /var/www/uploads/"
+echo "- Host: /var/www/uploads/ (SHARED!)"
+echo "- Nginx serve dari: /var/www/uploads/"
+
+=================================================================
+📋 PENJELASAN TEKNIS
+=================================================================
+
+**SEBELUM (BROKEN):**
+```
+Container: /var/www/uploads/image.jpg  ← Backend save di sini
+Host: /var/www/uploads/                ← KOSONG! Tidak ada file!
+Nginx: Serve dari /var/www/uploads/   ← 404 Not Found!
+```
+
+**SESUDAH (FIXED):**
+```
+Container: /var/www/uploads/image.jpg  ← Backend save di sini
+           ↓ (Docker volume mount)
+Host: /var/www/uploads/image.jpg       ← File MUNCUL di host!
+           ↓
+Nginx: Serve dari /var/www/uploads/   ← 200 OK! File ditemukan!
+```
+
+**Docker Volume Mount:**
+```yaml
+volumes:
+  - /var/www/uploads:/var/www/uploads
+    ↑                ↑
+    Host path        Container path
+```
+
+Dengan volume mount ini, file yang disimpan di container akan
+LANGSUNG muncul di host, sehingga Nginx bisa serve file tersebut!
+
+=================================================================

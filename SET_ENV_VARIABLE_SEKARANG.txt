@@ -1,0 +1,115 @@
+========================================
+SET ENVIRONMENT VARIABLE SEKARANG! 🚀
+========================================
+
+LANGKAH SETELAH HAPUS VARIABLE LAMA:
+-------------------------------------
+
+STEP 1: TAMBAH VARIABLE BARU
+-----------------------------
+1. Masih di halaman "Environment variables"
+2. Klik tombol "Add a variable" (hijau, di kanan atas)
+3. Isi form:
+   
+   Key (nama variable):
+   VITE_API_BASE_URL
+   
+   Values (pilih scope):
+   ✅ Same value for all deploy contexts
+   
+   Value:
+   https://api.4leafclover.id/api
+   
+4. Klik "Create variable"
+
+
+STEP 2: VERIFIKASI VARIABLE
+----------------------------
+Pastikan muncul di list:
+- Key: VITE_API_BASE_URL
+- Value: https://api.4leafclover.id/api
+- Scope: All scopes
+
+
+STEP 3: TRIGGER REDEPLOY
+-------------------------
+1. Klik "Deploys" (di top menu)
+2. Klik "Trigger deploy" (tombol di kanan atas)
+3. Pilih "Clear cache and deploy site"
+4. Klik "Trigger deploy"
+5. Tunggu deploy selesai (1-2 menit)
+
+
+STEP 4: CEK STATUS DEPLOY
+--------------------------
+Di halaman Deploys:
+- Status harus berubah dari "Building" → "Published" (hijau)
+- Commit message: "fix: auto-save profile image to database after upload"
+- Deploy time: ~1-2 menit
+
+
+STEP 5: TEST GAMBAR
+--------------------
+Setelah deploy selesai (status Published):
+
+1. Buka browser INCOGNITO (Ctrl + Shift + N)
+2. Buka: https://4leafclover.id/admin/login
+3. Login: admin@4leafclover.id / YourAdminPassword123!
+4. Klik menu "Home"
+5. Klik tab "Media & CV"
+6. Upload gambar baru
+7. Tunggu toast: "Image uploaded and saved successfully"
+8. Gambar akan LANGSUNG muncul!
+
+
+VERIFIKASI DI CONSOLE:
+----------------------
+Jika ingin memastikan environment variable sudah benar:
+
+1. Buka: https://4leafclover.id
+2. Tekan F12 → Console
+3. Ketik dan enter:
+   
+   fetch('https://api.4leafclover.id/api/about')
+     .then(r => r.json())
+     .then(d => console.log(d))
+   
+4. Harus muncul data about (tidak ada CORS error)
+5. Lihat profile_image path
+
+
+CEK NETWORK REQUEST:
+--------------------
+1. Tekan F12 → Network tab
+2. Upload gambar
+3. Cari request "upload"
+4. Klik request tersebut
+5. Lihat "Request URL":
+   ✅ Harus: https://api.4leafclover.id/api/upload
+   ❌ Jika masih HTTP atau IP → Deploy belum selesai
+
+
+JIKA MASIH TIDAK MUNCUL:
+-------------------------
+Kirim screenshot dari:
+1. Netlify environment variables (setelah ditambah)
+2. Netlify deploy status (harus Published)
+3. Browser Console (F12 → Console) saat upload
+4. Browser Network (F12 → Network → request upload)
+
+
+CATATAN PENTING:
+----------------
+- Pastikan variable name PERSIS: VITE_API_BASE_URL
+- Pastikan value PERSIS: https://api.4leafclover.id/api
+- Pastikan scope: All scopes (atau Same value for all)
+- Pastikan sudah trigger redeploy
+- Tunggu sampai deploy selesai (Published)
+
+
+JAMINAN:
+--------
+Setelah environment variable benar dan deploy selesai,
+gambar PASTI akan muncul! 🎯
+
+Ini adalah fix terakhir yang dibutuhkan!

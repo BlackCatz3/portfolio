@@ -1,0 +1,168 @@
+=================================================================
+🔧 FIX CORS + Copy File dari Container ke Host
+=================================================================
+
+## MASALAH:
+1. File 1767510567154-650945967.jpg ada di container tapi tidak di host
+2. Nginx tidak menambahkan CORS headers untuk /uploads/
+3. Browser block request karena CORS policy
+
+## SOLUSI - Copy paste perintah ini:
+
+=================================================================
+
+echo "=== Step 1: Copy file dari container ke host ==="
+docker cp portfolio-backend:/var/www/uploads/1767510567154-650945967.jpg /var/www/uploads/1767510567154-650945967.jpg 2>/dev/null || echo "File mungkin belum ada di container"
+
+echo ""
+echo "=== Step 2: Copy semua file dari container ==="
+docker exec portfolio-backend ls -la /var/www/uploads/ 2>/dev/null || echo "Directory tidak ada di container"
+
+echo ""
+echo "=== Step 3: Set permissions ==="
+chmod 755 /var/www/uploads
+chmod 644 /var/www/uploads/*.jpg 2>/dev/null || echo "No jpg files yet"
+
+echo ""
+echo "=== Step 4: Update Nginx config dengan CORS headers ==="
+cat > /etc/nginx/sites-available/api.4leafclover.id << 'EOF'
+server {
+    server_name api.4leafclover.id;
+    client_max_body_size 50M;
+
+    # Serve static uploads files directly with CORS
+    location /uploads/ {
+        alias /var/www/uploads/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        
+        # CORS headers untuk static files
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization' always;
+        
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+            add_header 'Access-Control-Max-Age' 1728000;
+            add_header 'Content-Type' 'text/plain; charset=utf-8';
+            add_header 'Content-Length' 0;
+            return 204;
+        }
+        
+        access_log off;
+    }
+
+    # Proxy API requests to backend
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/api.4leafclover.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.4leafclover.id/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = api.4leafclover.id) {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 80;
+    server_name api.4leafclover.id;
+    return 404;
+}
+EOF
+
+echo ""
+echo "=== Step 5: Test Nginx config ==="
+nginx -t
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "=== Step 6: Reload Nginx ==="
+    systemctl reload nginx
+    
+    echo ""
+    echo "=== Step 7: List files di /var/www/uploads ==="
+    ls -lah /var/www/uploads/
+    
+    echo ""
+    echo "=== Step 8: Test akses file ==="
+    curl -I https://api.4leafclover.id/uploads/1767510567154-650945967.jpg
+    
+    echo ""
+    echo "=== ✅ SELESAI! ==="
+    echo ""
+    echo "Sekarang:"
+    echo "1. Upload gambar BARU di admin panel"
+    echo "2. Klik 'Save Media'"
+    echo "3. Refresh halaman (F5)"
+    echo "4. Gambar seharusnya muncul!"
+else
+    echo "ERROR: Nginx config test failed!"
+fi
+
+
+=================================================================
+📋 PENJELASAN PERUBAHAN
+=================================================================
+
+**Yang Ditambahkan ke Nginx:**
+
+```nginx
+location /uploads/ {
+    alias /var/www/uploads/;
+    
+    # CORS headers - INI YANG PENTING!
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization' always;
+    
+    # Handle preflight requests
+    if ($request_method = 'OPTIONS') {
+        return 204;
+    }
+}
+```
+
+**Kenapa CORS Error terjadi:**
+- Browser: "Saya mau ambil gambar dari https://api.4leafclover.id/uploads/"
+- Nginx: "OK, ini gambarnya" (tapi tidak kirim CORS header)
+- Browser: "Eh, tidak ada Access-Control-Allow-Origin header! BLOCKED!"
+
+**Setelah fix:**
+- Browser: "Saya mau ambil gambar dari https://api.4leafclover.id/uploads/"
+- Nginx: "OK, ini gambarnya + Access-Control-Allow-Origin: *"
+- Browser: "OK, boleh! Gambar ditampilkan!" ✅
+
+=================================================================
+⚠️ PENTING - UPLOAD GAMBAR BARU!
+=================================================================
+
+Gambar lama (1767510567154-650945967.jpg) mungkin masih di container.
+
+**Cara paling mudah:**
+1. Buka admin panel: https://4leafclover.id/admin/home
+2. Upload gambar BARU (jangan pakai yang lama)
+3. Klik "Save Media"
+4. Refresh halaman (F5)
+5. Gambar baru seharusnya muncul!
+
+**Kenapa harus upload baru:**
+- Backend sekarang sudah dikonfigurasi save ke /var/www/uploads/
+- Gambar baru akan langsung tersimpan di lokasi yang benar
+- Tidak perlu copy-copy lagi dari container
+
+=================================================================

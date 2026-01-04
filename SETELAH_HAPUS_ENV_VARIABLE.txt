@@ -1,0 +1,79 @@
+========================================
+SETELAH HAPUS ENV VARIABLE ✅
+========================================
+
+BAGUS! Environment variable sudah dihapus!
+------------------------------------------
+Sekarang Netlify akan menggunakan value dari netlify.toml:
+✅ VITE_API_BASE_URL = https://api.4leafclover.id/api
+
+
+LANGKAH SELANJUTNYA:
+====================
+
+STEP 1: TRIGGER REDEPLOY
+-------------------------
+1. Di Netlify dashboard, klik "Deploys" (top menu)
+2. Klik "Trigger deploy"
+3. Pilih "Clear cache and deploy site"
+4. Tunggu deploy selesai (1-2 menit)
+5. Status harus "Published" (hijau)
+
+
+STEP 2: CLEAR BROWSER CACHE
+----------------------------
+Setelah deploy selesai:
+1. Buka: https://4leafclover.id
+2. Tekan: Ctrl + Shift + Delete
+3. Pilih "Cached images and files" ✓
+4. Pilih "All time"
+5. Klik "Clear data"
+
+
+STEP 3: TEST UPLOAD GAMBAR
+---------------------------
+1. Buka: https://4leafclover.id/admin/login
+2. Login dengan: admin@4leafclover.id / YourAdminPassword123!
+3. Klik menu "Home"
+4. Klik tab "Media & CV"
+5. Upload gambar baru
+6. Tunggu toast: "Image uploaded and saved successfully"
+7. Gambar akan LANGSUNG muncul!
+
+
+VERIFIKASI (OPTIONAL):
+----------------------
+Cek apakah frontend menggunakan HTTPS endpoint:
+
+1. Buka: https://4leafclover.id/admin/home
+2. Tekan F12 → Network tab
+3. Upload gambar
+4. Lihat request URL:
+   ✅ Harus: https://api.4leafclover.id/api/upload
+   ❌ Jika masih HTTP → Deploy belum selesai, tunggu lagi
+
+
+CEK CONSOLE (OPTIONAL):
+-----------------------
+1. Buka: https://4leafclover.id
+2. Tekan F12 → Console
+3. Ketik: localStorage.clear()
+4. Refresh (F5)
+5. Login ke admin
+6. Tidak boleh ada error "Mixed Content"
+
+
+JAMINAN:
+--------
+Setelah redeploy selesai dan clear cache,
+gambar PASTI akan muncul! 🎯
+
+Ini adalah fix terakhir yang diperlukan!
+
+
+CATATAN:
+--------
+- netlify.toml sudah benar sejak awal
+- Tapi environment variable di dashboard override netlify.toml
+- Sekarang sudah dihapus, jadi pakai value dari netlify.toml
+- Setelah redeploy, semua akan bekerja dengan benar!

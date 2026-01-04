@@ -1,0 +1,54 @@
+=================================================================
+🔧 RESTART CONTAINER DAN TEST - COPY PASTE INI
+=================================================================
+
+## MASALAH DITEMUKAN:
+- Volume mount sudah benar di docker-compose.yml ✅
+- Backend code sudah benar (/var/www/uploads) ✅  
+- Nginx config sudah benar + CORS ✅
+- File ada di host /var/www/uploads/ ✅
+- TAPI: Container TIDAK BISA akses /var/www/uploads/ ❌
+
+## SOLUSI:
+Restart container agar volume mount aktif!
+
+=================================================================
+📋 JALANKAN SCRIPT INI:
+=================================================================
+
+ssh root@43.228.213.128
+
+# Masukkan password, lalu jalankan:
+
+cd /root/n8n-production/portfolio
+
+echo "=== RESTART CONTAINERS ==="
+docker-compose down
+docker-compose up -d
+
+echo "Waiting for backend to start..."
+sleep 15
+
+echo ""
+echo "=== CEK CONTAINER ACCESS ==="
+docker exec portfolio-backend ls -lah /var/www/uploads/
+
+echo ""
+echo "=== TEST FILE ACCESS (latest file) ==="
+curl -I https://api.4leafclover.id/uploads/1767512015025-907279805.jpg
+
+echo ""
+echo "=== CEK BACKEND LOGS ==="
+docker logs portfolio-backend --tail=20
+
+echo ""
+echo "=== SELESAI! ==="
+echo ""
+echo "Jika container bisa akses /var/www/uploads/, maka:"
+echo "1. Buka https://4leafclover.id/admin/home (INCOGNITO!)"
+echo "2. Upload gambar BARU"
+echo "3. Klik 'Save Media'"
+echo "4. Hard refresh (Ctrl + Shift + R)"
+echo "5. Gambar akan muncul!"
+
+=================================================================
