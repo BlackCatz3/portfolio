@@ -1,0 +1,147 @@
+🔍 DEBUG: reCAPTCHA Token Invalid Issue
+========================================
+
+MASALAH:
+--------
+❌ POST /api/messages 400 (Bad Request)
+❌ reCAPTCHA verification failed: invalid-input-response
+❌ Possible bot attack from IP: xxx.xxx.xxx.xxx
+
+KEMUNGKINAN PENYEBAB:
+---------------------
+
+1. **Token Expired** (paling mungkin)
+   - reCAPTCHA token hanya valid 2 menit
+   - Jika user centang reCAPTCHA, lalu tunggu > 2 menit, token expired
+   - Solution: Centang reCAPTCHA, langsung klik Send
+
+2. **Token Already Used**
+   - Token hanya bisa digunakan 1x
+   - Jika submit gagal, token sudah terpakai
+   - Solution: Reset reCAPTCHA (sudah ada di code)
+
+3. **Wrong Site Key**
+   - Frontend pakai site key yang salah
+   - Backend expect token dari site key tertentu
+   - Solution: Verify VITE_RECAPTCHA_SITE_KEY di Netlify
+
+4. **Network Issue**
+   - Token tidak sampai ke backend
+   - Or token corrupted during transmission
+   - Solution: Check browser console
+
+CARA DEBUG:
+-----------
+
+1. **Cek Browser Console (F12)**:
+   ```
+   Look for:
+   - reCAPTCHA token value
+   - Request payload
+   - Response error
+   ```
+
+2. **Cek Backend Logs**:
+   ```bash
+   ssh root@43.228.213.128
+   docker logs portfolio-backend -f
+   ```
+   
+   Look for:
+   - reCAPTCHA verification failed
+   - Invalid token details
+
+3. **Test dengan Fresh Token**:
+   - Refresh page (Ctrl + F5)
+   - Isi form
+   - Centang reCAPTCHA
+   - **LANGSUNG** klik Send (jangan tunggu)
+
+4. **Verify Environment Variables**:
+   
+   Frontend (Netlify):
+   ```
+   VITE_RECAPTCHA_SITE_KEY=6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+   ```
+   
+   Backend (VPS):
+   ```bash
+   docker exec portfolio-backend printenv | grep RECAPTCHA
+   # Should show: RECAPTCHA_SECRET_KEY=6Lf49T8sAAAAAACEiOAI6BuSvUsqZBPynKADEmm5I
+   ```
+
+SOLUSI CEPAT:
+-------------
+
+**Option 1: Test dengan Incognito**
+1. Buka Incognito/Private window
+2. Go to https://4leafclover.id
+3. Isi form
+4. Centang reCAPTCHA
+5. LANGSUNG klik Send (< 10 detik)
+
+**Option 2: Clear Everything**
+1. Clear browser cache (Ctrl + Shift + Delete)
+2. Close all tabs
+3. Restart browser
+4. Try again
+
+**Option 3: Verify Netlify Deploy**
+1. Check Netlify dashboard
+2. Verify latest deploy is live
+3. Check deploy logs for errors
+4. Force redeploy if needed
+
+EXPECTED BEHAVIOR:
+------------------
+
+✅ User centang reCAPTCHA
+✅ Puzzle muncul dan diselesaikan
+✅ Token generated (valid 2 minutes)
+✅ User klik Send
+✅ Token dikirim ke backend
+✅ Backend verify dengan Google
+✅ Google return success
+✅ Message saved to database
+
+CURRENT BEHAVIOR:
+-----------------
+
+✅ User centang reCAPTCHA
+✅ Puzzle muncul dan diselesaikan
+✅ Token generated
+✅ User klik Send
+✅ Token dikirim ke backend
+❌ Backend verify dengan Google
+❌ Google return: invalid-input-response
+❌ Backend reject request (400)
+
+NEXT STEPS:
+-----------
+
+1. Coba test dengan fresh token (< 10 detik after centang)
+2. Jika masih gagal, screenshot browser console error
+3. Jika masih gagal, cek Netlify env variables
+4. Jika masih gagal, verify reCAPTCHA keys di Google Console
+
+TESTING COMMAND:
+----------------
+
+Test backend directly dengan curl:
+
+```bash
+# Get a fresh token from https://4leafclover.id
+# Then test:
+
+curl -X POST https://api.4leafclover.id/api/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@gmail.com",
+    "message": "Test message",
+    "recaptchaToken": "YOUR_FRESH_TOKEN_HERE"
+  }'
+```
+
+If this works, problem is in frontend.
+If this fails, problem is in backend reCAPTCHA verification.
