@@ -1,0 +1,220 @@
+=================================================================
+🔧 FIX DATABASE SCHEMA - Missing Tables & Columns
+=================================================================
+
+MASALAH YANG DITEMUKAN:
+1. Table "experiences" kekurangan kolom "order_index"
+2. Table "about" belum ada
+3. Kemungkinan table lain juga belum lengkap
+
+
+SOLUSI: JALANKAN SQL FIX SCRIPT
+=================================================================
+
+STEP 1: LOGIN KE VPS
+-----------------------------------------------------------------
+ssh root@43.228.213.128
+
+
+STEP 2: COPY SQL SCRIPT KE VPS
+-----------------------------------------------------------------
+# Buat file SQL di VPS
+cat > /tmp/fix-schema.sql << 'EOF'
+-- Fix Database Schema
+
+-- 1. Add order_index column to experiences table
+ALTER TABLE experiences 
+ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0;
+
+-- 2. Create about table if not exists
+CREATE TABLE IF NOT EXISTS about (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    subtitle TEXT,
+    description TEXT,
+    image_url TEXT,
+    resume_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Insert default about data
+INSERT INTO about (title, subtitle, description)
+SELECT 'Your Name', 'Your Title', 'Your description here'
+WHERE NOT EXISTS (SELECT 1 FROM about);
+
+-- 4. Create about_info table if not exists
+CREATE TABLE IF NOT EXISTS about_info (
+    id SERIAL PRIMARY KEY,
+    content TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Insert default about_info data
+INSERT INTO about_info (content)
+SELECT 'About information here'
+WHERE NOT EXISTS (SELECT 1 FROM about_info);
+
+-- 6. Create contact table if not exists
+CREATE TABLE IF NOT EXISTS contact (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    linkedin_url TEXT,
+    github_url TEXT,
+    twitter_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. Insert default contact data
+INSERT INTO contact (email, phone)
+SELECT 'admin@4leafclover.id', '+62'
+WHERE NOT EXISTS (SELECT 1 FROM contact);
+EOF
+
+
+STEP 3: JALANKAN SQL SCRIPT
+-----------------------------------------------------------------
+docker exec -i postgres-db psql -U postgres -d portfolio_cms_2026 < /tmp/fix-schema.sql
+
+
+STEP 4: VERIFY TABLES
+-----------------------------------------------------------------
+docker exec -i postgres-db psql -U postgres -d portfolio_cms_2026 << 'EOF'
+-- List all tables
+\dt
+
+-- Check experiences columns
+\d experiences
+
+-- Check about table
+SELECT * FROM about;
+
+-- Check about_info table
+SELECT * FROM about_info;
+
+-- Check contact table
+SELECT * FROM contact;
+EOF
+
+
+STEP 5: RESTART BACKEND
+-----------------------------------------------------------------
+cd /root/backend
+docker-compose restart
+
+# Wait 5 seconds
+sleep 5
+
+# Check logs
+docker logs backend-app-1 --tail 30
+
+
+STEP 6: TEST API ENDPOINTS
+-----------------------------------------------------------------
+# Test dari VPS
+curl https://api.4leafclover.id/api/projects
+curl https://api.4leafclover.id/api/about
+curl https://api.4leafclover.id/api/experiences
+curl https://api.4leafclover.id/api/contact
+
+# Harusnya return data atau empty array [], bukan error 500
+
+
+=================================================================
+🚀 QUICK FIX (ONE COMMAND)
+=================================================================
+
+Jalankan semua perintah sekaligus:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+# Create fix script
+cat > /tmp/fix-schema.sql << 'EOF'
+ALTER TABLE experiences ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS about (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    subtitle TEXT,
+    description TEXT,
+    image_url TEXT,
+    resume_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO about (title, subtitle, description)
+SELECT 'Your Name', 'Your Title', 'Your description here'
+WHERE NOT EXISTS (SELECT 1 FROM about);
+
+CREATE TABLE IF NOT EXISTS about_info (
+    id SERIAL PRIMARY KEY,
+    content TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO about_info (content)
+SELECT 'About information here'
+WHERE NOT EXISTS (SELECT 1 FROM about_info);
+
+CREATE TABLE IF NOT EXISTS contact (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    linkedin_url TEXT,
+    github_url TEXT,
+    twitter_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO contact (email, phone)
+SELECT 'admin@4leafclover.id', '+62'
+WHERE NOT EXISTS (SELECT 1 FROM contact);
+EOF
+
+# Run fix script
+docker exec -i postgres-db psql -U postgres -d portfolio_cms_2026 < /tmp/fix-schema.sql
+
+# Restart backend
+cd /root/backend
+docker-compose restart
+
+# Wait and check
+sleep 5
+echo "=== Testing API ==="
+curl -s https://api.4leafclover.id/api/about | head -20
+ENDSSH
+
+
+=================================================================
+✅ EXPECTED RESULT
+=================================================================
+
+Setelah menjalankan script, API endpoints harusnya return:
+
+1. /api/about → {"id":1,"title":"Your Name",...}
+2. /api/experiences → [] atau [{"id":1,...}]
+3. /api/projects → [] atau [{"id":1,...}]
+4. /api/contact → {"id":1,"email":"admin@4leafclover.id",...}
+
+Bukan error 500 lagi!
+
+
+=================================================================
+📝 NOTES
+=================================================================
+
+- Script ini aman dijalankan berkali-kali (IF NOT EXISTS)
+- Data existing tidak akan hilang
+- Hanya menambahkan yang kurang
+- Default data akan diinsert jika table kosong
+
+=================================================================
