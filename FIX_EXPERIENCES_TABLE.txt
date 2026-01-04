@@ -22,9 +22,12 @@ SOLUSI YANG SUDAH DILAKUKAN:
         ADD COLUMN location VARCHAR(255),
         ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
-✅ 3. Restart backend container
+✅ 3. Ubah kolom title menjadi nullable (karena controller tidak mengisi kolom ini)
+   SQL: ALTER TABLE experiences ALTER COLUMN title DROP NOT NULL;
 
-✅ 4. Verify struktur table sudah benar
+✅ 4. Restart backend container
+
+✅ 5. Verify struktur table sudah benar
 
 ========================================
 STATUS:
