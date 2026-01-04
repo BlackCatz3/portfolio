@@ -4,14 +4,16 @@ import {
   getMessageById,
   createMessage,
   updateMessageStatus,
-  deleteMessage
+  deleteMessage,
+  validateMessage
 } from '../controllers/messagesController.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { contactFormLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-// Public route
-router.post('/', createMessage);
+// Public route with rate limiting and validation
+router.post('/', contactFormLimiter, validateMessage, createMessage);
 
 // Protected routes
 router.get('/', authenticateToken, getAllMessages);

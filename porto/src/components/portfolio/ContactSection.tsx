@@ -27,6 +27,11 @@ export const ContactSection = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<{
+    name?: string;
+    email?: string;
+    message?: string;
+  }>({});
   const [contact, setContact] = useState<ContactData | null>(null);
   const [about, setAbout] = useState<AboutData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,16 +97,88 @@ export const ContactSection = () => {
     },
   ].filter(link => link.visible) : [];
 
+  const validateForm = () => {
+    const errors: { name?: string; email?: string; message?: string } = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+    } else if (formData.name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters";
+    } else if (formData.name.trim().length > 100) {
+      errors.name = "Name must not exceed 100 characters";
+    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.name)) {
+      errors.name = "Name can only contain letters, spaces, hyphens, and apostrophes";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    } else if (formData.email.length > 255) {
+      errors.email = "Email is too long";
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      errors.message = "Message is required";
+    } else if (formData.message.trim().length < 10) {
+      errors.message = "Message must be at least 10 characters";
+    } else if (formData.message.trim().length > 5000) {
+      errors.message = "Message must not exceed 5000 characters";
+    }
+
+    // Check for suspicious content (HTML/Script tags)
+    const suspiciousPatterns = [
+      /<script/i,
+      /javascript:/i,
+      /on\w+\s*=/i,
+      /<iframe/i,
+    ];
+    const allContent = `${formData.name} ${formData.email} ${formData.message}`;
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(allContent)) {
+        errors.message = "Invalid content detected. Please remove any HTML or script tags.";
+        break;
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setFormErrors({});
+    
+    // Validate form
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
       await messagesAPI.create(formData);
       toast.success("Message sent successfully! I'll get back to you soon.");
       setFormData({ name: "", email: "", message: "" });
+      setFormErrors({});
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to send message. Please try again.");
+      const errorMessage = error.response?.data?.error || "Failed to send message. Please try again.";
+      
+      // Handle rate limit error specifically
+      if (error.response?.status === 429) {
+        toast.error("Too many messages sent. Please try again after 15 minutes.");
+      } else if (error.response?.data?.details) {
+        // Show validation errors from backend
+        toast.error(error.response.data.details.join(", "));
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -187,8 +264,13 @@ export const ContactSection = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="h-12 bg-card border-border/50 focus:border-primary"
+                      className={`h-12 bg-card border-border/50 focus:border-primary ${
+                        formErrors.name ? "border-red-500" : ""
+                      }`}
                     />
+                    {formErrors.name && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="email" className="text-sm font-medium mb-2 block">
@@ -202,8 +284,13 @@ export const ContactSection = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="h-12 bg-card border-border/50 focus:border-primary"
+                      className={`h-12 bg-card border-border/50 focus:border-primary ${
+                        formErrors.email ? "border-red-500" : ""
+                      }`}
                     />
+                    {formErrors.email && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="message" className="text-sm font-medium mb-2 block">
@@ -216,8 +303,16 @@ export const ContactSection = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
-                      className="min-h-[150px] bg-card border-border/50 focus:border-primary resize-none"
+                      className={`min-h-[150px] bg-card border-border/50 focus:border-primary resize-none ${
+                        formErrors.message ? "border-red-500" : ""
+                      }`}
                     />
+                    {formErrors.message && (
+                      <p className="text-red-500 text-sm mt-1">{formErrors.message}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formData.message.length}/5000 characters
+                    </p>
                   </div>
                 </div>
                 
