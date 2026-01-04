@@ -1,0 +1,321 @@
+⚠️ PENTING: NETLIFY ENVIRONMENT VARIABLE BELUM DISET!
+================================================
+
+## 🐛 MASALAH YANG TERJADI:
+
+**User Report:** "lah gimana malah langsung masuk ga ada capta"
+
+**Artinya:**
+- Message langsung terkirim tanpa verifikasi reCAPTCHA
+- Tidak ada badge reCAPTCHA di pojok kanan bawah
+- reCAPTCHA tidak bekerja sama sekali
+
+**Root Cause:**
+- File `.env.production` di-gitignore (tidak ter-push ke GitHub)
+- Netlify tidak punya akses ke environment variable
+- Frontend menggunakan fallback test key yang tidak valid
+
+---
+
+## 🔍 CEK DULU:
+
+### Cek di Browser Console:
+
+1. Buka: https://4leafclover.id
+2. Tekan F12 (buka Developer Tools)
+3. Ketik di Console:
+   ```javascript
+   import.meta.env.VITE_RECAPTCHA_SITE_KEY
+   ```
+4. Lihat hasilnya:
+
+**Kalau hasilnya:**
+- `"6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"` ← Test key (SALAH!)
+- `undefined` ← Tidak ada (SALAH!)
+- `"6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5"` ← Production key (BENAR!)
+
+**Kalau test key atau undefined:**
+→ Environment variable belum diset di Netlify!
+
+---
+
+## ✅ SOLUSI: SET ENVIRONMENT VARIABLE DI NETLIFY
+
+### STEP 1: Login ke Netlify
+
+1. Buka: https://app.netlify.com
+2. Login dengan akun kamu
+3. Pilih site: **4leafclover.id**
+
+---
+
+### STEP 2: Masuk ke Environment Variables
+
+1. Di sidebar kiri, klik **"Site configuration"**
+2. Scroll ke bawah, klik **"Environment variables"**
+3. Atau langsung ke: https://app.netlify.com/sites/[your-site-name]/configuration/env
+
+---
+
+### STEP 3: Add Variable
+
+**Kalau belum ada variable sama sekali:**
+
+1. Klik button **"Add a variable"** atau **"Add environment variable"**
+2. Isi form:
+   ```
+   Key: VITE_RECAPTCHA_SITE_KEY
+   Value: 6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+   ```
+3. Scope: Pilih **"All"** atau **"Production"**
+4. Klik **"Create variable"** atau **"Save"**
+
+**Kalau sudah ada variable `VITE_RECAPTCHA_SITE_KEY`:**
+
+1. Cari variable: `VITE_RECAPTCHA_SITE_KEY`
+2. Klik **"Edit"** atau icon pensil
+3. Update value ke:
+   ```
+   6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+   ```
+4. Klik **"Save"**
+
+---
+
+### STEP 4: Trigger Redeploy
+
+**PENTING:** Setelah set/update environment variable, kamu HARUS redeploy!
+
+1. Klik **"Deploys"** di top menu
+2. Klik button **"Trigger deploy"**
+3. Pilih **"Deploy site"** atau **"Clear cache and deploy site"**
+4. Tunggu sampai status berubah jadi **"Published"** (2-3 menit)
+
+---
+
+## 🧪 CARA TEST SETELAH REDEPLOY:
+
+### Test 1: Cek Environment Variable
+
+1. Buka: https://4leafclover.id
+2. Tekan F12
+3. Ketik di Console:
+   ```javascript
+   import.meta.env.VITE_RECAPTCHA_SITE_KEY
+   ```
+4. **Expected:** `"6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5"`
+
+---
+
+### Test 2: Cek Badge reCAPTCHA
+
+1. Scroll ke bagian Contact
+2. Lihat **pojok kanan bawah** halaman
+3. **Expected:** Ada badge kecil "reCAPTCHA"
+
+**Kalau badge tidak ada:**
+- Environment variable belum diset dengan benar
+- Atau Netlify belum redeploy
+
+---
+
+### Test 3: Test Form Contact
+
+1. Isi form:
+   - Name: Test User
+   - Email: test@example.com
+   - Message: Testing reCAPTCHA
+2. Klik "Send Message"
+3. **Expected:**
+   - Button jadi "Sending..." (loading)
+   - reCAPTCHA bekerja di background
+   - Message terkirim
+   - Toast: "Message sent successfully!"
+
+---
+
+### Test 4: Cek Network Tab
+
+1. Buka F12 → Tab "Network"
+2. Submit form
+3. Cari request ke `/api/messages`
+4. Klik request tersebut
+5. Lihat tab "Payload" atau "Request"
+6. **Expected:** Ada field `recaptchaToken` dengan value panjang
+
+**Kalau tidak ada `recaptchaToken`:**
+- reCAPTCHA tidak ter-execute
+- Site key salah atau tidak ada
+
+---
+
+## 📊 COMPARISON:
+
+### SEBELUM Set Env Var (SALAH):
+```
+Frontend:
+  VITE_RECAPTCHA_SITE_KEY = undefined atau test key
+  ↓
+  reCAPTCHA tidak load
+  ↓
+  Tidak ada badge
+  ↓
+  executeAsync() return null atau test token
+  ↓
+  Backend reject (kalau test token)
+  ATAU
+  Backend terima tanpa verifikasi (kalau null)
+```
+
+### SETELAH Set Env Var (BENAR):
+```
+Frontend:
+  VITE_RECAPTCHA_SITE_KEY = production key
+  ↓
+  reCAPTCHA load dengan benar
+  ↓
+  Badge muncul di pojok
+  ↓
+  executeAsync() return production token
+  ↓
+  Backend verify dengan Google
+  ↓
+  Success! ✅
+```
+
+---
+
+## 🔐 KEYS SUMMARY:
+
+### Production Keys (YANG HARUS DIPAKAI):
+
+**Frontend (Netlify):**
+```
+Variable Name: VITE_RECAPTCHA_SITE_KEY
+Value: 6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5
+Type: Site Key (public)
+```
+
+**Backend (VPS):**
+```
+Variable Name: RECAPTCHA_SECRET_KEY
+Value: 6Lf49T8sAAAAAACEiOAI6BuSvUsqZBPynKADEmm5I
+Type: Secret Key (private)
+Status: ✅ Sudah diset (hardcoded di code)
+```
+
+### Test Keys (JANGAN DIPAKAI DI PRODUCTION):
+
+**Test Site Key:**
+```
+6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+```
+- Ini adalah fallback key di code
+- Hanya untuk development/testing
+- Tidak boleh dipakai di production!
+
+---
+
+## 🐛 TROUBLESHOOTING:
+
+### Problem 1: Badge Tidak Muncul Setelah Set Env Var
+
+**Possible Causes:**
+- Netlify belum redeploy
+- Browser cache
+- Typo di value
+
+**Solution:**
+1. Pastikan sudah trigger redeploy
+2. Tunggu sampai status "Published"
+3. Clear browser cache (CTRL+SHIFT+DELETE)
+4. Hard refresh (CTRL+F5)
+5. Cek value env var (tidak ada spasi di awal/akhir)
+
+---
+
+### Problem 2: Masih Pakai Test Key
+
+**Check:**
+```javascript
+// Di browser console
+import.meta.env.VITE_RECAPTCHA_SITE_KEY
+```
+
+**Kalau masih test key:**
+1. Cek env var di Netlify (pastikan value benar)
+2. Trigger redeploy lagi
+3. Clear cache dan hard refresh
+
+---
+
+### Problem 3: executeAsync() Return Null
+
+**Possible Causes:**
+- Site key salah
+- Domain tidak terdaftar di Google reCAPTCHA
+
+**Solution:**
+1. Cek site key di Netlify (harus exact match)
+2. Login ke Google reCAPTCHA console
+3. Pastikan domain `4leafclover.id` terdaftar
+4. Pastikan type: "Challenge (v2)" dan "Invisible reCAPTCHA badge"
+
+---
+
+## 📝 CHECKLIST:
+
+Sebelum test, pastikan:
+
+- [ ] Login ke Netlify
+- [ ] Masuk ke site: 4leafclover.id
+- [ ] Buka Environment variables
+- [ ] Add/Edit: `VITE_RECAPTCHA_SITE_KEY`
+- [ ] Value: `6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5`
+- [ ] Save
+- [ ] Trigger redeploy
+- [ ] Tunggu sampai "Published"
+- [ ] Clear browser cache
+- [ ] Test di https://4leafclover.id
+- [ ] Cek badge muncul
+- [ ] Test form contact
+- [ ] Verify message terkirim dengan reCAPTCHA
+
+---
+
+## ✨ SUMMARY:
+
+**Problem:**
+- ❌ Message langsung masuk tanpa reCAPTCHA
+- ❌ Tidak ada badge di pojok
+- ❌ Environment variable belum diset
+
+**Solution:**
+- ✅ Set `VITE_RECAPTCHA_SITE_KEY` di Netlify
+- ✅ Value: `6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5`
+- ✅ Trigger redeploy
+- ✅ Test di production
+
+**Estimated Time:** 5 menit
+
+Setelah set environment variable dan redeploy, reCAPTCHA akan bekerja dengan sempurna! 🛡️✨
+
+---
+
+## 🎯 NEXT STEPS:
+
+1. **Set Env Var** (3 menit)
+   - Login Netlify
+   - Add `VITE_RECAPTCHA_SITE_KEY`
+   - Value: `6Lf49T8sAAAAABpJ7AT8oV9JFNZw8rTQ6GxzTJt5`
+
+2. **Redeploy** (2 menit)
+   - Trigger deploy
+   - Tunggu "Published"
+
+3. **Test** (2 menit)
+   - Cek badge muncul
+   - Test form contact
+   - Verify reCAPTCHA bekerja
+
+Good luck! 🚀
