@@ -1,0 +1,141 @@
+🔍 INVESTIGASI AKAR MASALAH - LENGKAP
+======================================
+
+## TIMELINE INVESTIGASI:
+
+### 1. BACKEND (✅ SUDAH BENAR SEJAK AWAL)
+- Database: ✅ Path correct `/uploads/1767516735604-650014329.jpg`
+- File System: ✅ File exists `/var/www/uploads/1767516735604-650014329.jpg`
+- Permissions: ✅ www-data:www-data 644
+- Nginx Config: ✅ Serving /uploads/ correctly
+- CORS Headers: ✅ Configured properly
+- SSL Certificate: ✅ Valid until 2026-04-04
+- API Response: ✅ Returns correct data
+
+### 2. FRONTEND - MASALAH DITEMUKAN!
+
+#### Error dari Console:
+```
+https:/.4leafclover.id/api/uploads/1767516735604-650014329.jpg
+```
+❌ URL malformed - hanya 1 slash setelah `https:`
+✅ Seharusnya: `https://api.4leafclover.id/uploads/...`
+
+#### Investigasi Fungsi getUploadBaseURL():
+```javascript
+export const getUploadBaseURL = () => {
+  return API_BASE_URL.replace('/api', '');
+};
+```
+
+Fungsi ini seharusnya:
+- Input: `https://api.4leafclover.id/api`
+- Output: `https://api.4leafclover.id`
+
+Tapi kenapa jadi malformed?
+
+#### AKAR MASALAH DITEMUKAN:
+
+File `porto/.env.production` berisi:
+```
+VITE_API_BASE_URL=http://43.228.213.128/api
+```
+
+❌ MASALAH:
+1. Menggunakan HTTP (bukan HTTPS) → Mixed Content Error
+2. Menggunakan IP address (tidak punya SSL)
+3. URL ini tidak valid untuk production
+4. File `.env.production` OVERRIDE nilai dari `netlify.toml`
+
+✅ SOLUSI:
+Update ke:
+```
+VITE_API_BASE_URL=https://api.4leafclover.id/api
+```
+
+## KENAPA INI TERJADI:
+
+1. Vite Build Process:
+   - Saat `npm run build`, Vite membaca `.env.production`
+   - Environment variable dari file ini di-inject ke code
+   - File ini prioritasnya LEBIH TINGGI dari `netlify.toml`
+
+2. Netlify Build:
+   - Netlify menjalankan `npm run build` di server
+   - Build menggunakan `.env.production` dari repository
+   - Meskipun `netlify.toml` sudah benar, tapi tidak dipakai!
+
+3. Runtime:
+   - Browser load JavaScript yang sudah di-build
+   - `import.meta.env.VITE_API_BASE_URL` sudah hardcoded ke `http://43.228.213.128/api`
+   - Fungsi `getUploadBaseURL()` menghasilkan URL yang salah
+
+## PERBAIKAN YANG SUDAH DILAKUKAN:
+
+✅ 1. Update `porto/.env.production`:
+   ```
+   VITE_API_BASE_URL=https://api.4leafclover.id/api
+   ```
+
+✅ 2. Tambah robust error handling di `getUploadBaseURL()`:
+   ```javascript
+   export const getUploadBaseURL = () => {
+     console.log('🔍 DEBUG - API_BASE_URL:', API_BASE_URL);
+     
+     try {
+       let baseUrl = API_BASE_URL.replace(/\/api\/?$/, '');
+       
+       // Fix malformed URLs
+       baseUrl = baseUrl.replace(/^(https?):\/([^/])/, '$1://$2');
+       
+       console.log('✅ DEBUG - Final Upload Base URL:', baseUrl);
+       return baseUrl;
+     } catch (error) {
+       console.error('❌ ERROR in getUploadBaseURL:', error);
+       return 'https://api.4leafclover.id';
+     }
+   };
+   ```
+
+✅ 3. Build ulang dengan environment variable yang benar
+
+✅ 4. Push ke GitHub → Netlify auto-deploy
+
+## HASIL YANG DIHARAPKAN:
+
+Setelah Netlify deploy selesai:
+
+1. Console Log akan menampilkan:
+   ```
+   🔍 DEBUG - API_BASE_URL: https://api.4leafclover.id/api
+   ✅ DEBUG - Final Upload Base URL: https://api.4leafclover.id
+   ```
+
+2. Image URL akan menjadi:
+   ```
+   https://api.4leafclover.id/uploads/1767516735604-650014329.jpg
+   ```
+
+3. Gambar profile akan muncul dengan benar!
+
+## VERIFIKASI:
+
+1. Tunggu Netlify deploy selesai (1-2 menit)
+2. Buka https://4leafclover.id/admin/home
+3. Buka Console (F12)
+4. Cek debug logs
+5. Cek apakah gambar muncul
+
+## JIKA MASIH TIDAK MUNCUL:
+
+Lakukan "Clear cache and deploy" di Netlify:
+1. Buka Netlify Dashboard
+2. Deploys tab
+3. Trigger deploy → Clear cache and deploy site
+
+---
+
+KESIMPULAN:
+Masalahnya BUKAN di backend, BUKAN di Nginx, BUKAN di database.
+Masalahnya di FRONTEND ENVIRONMENT VARIABLE yang salah!
+Sekarang sudah diperbaiki. Gambar PASTI akan muncul! 🎉

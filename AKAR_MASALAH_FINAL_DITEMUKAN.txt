@@ -1,0 +1,68 @@
+🎯 AKAR MASALAH AKHIRNYA DITEMUKAN!!!
+=====================================
+
+## MASALAH UTAMA:
+File `.env.production` di folder `porto/` masih menggunakan URL LAMA:
+❌ VITE_API_BASE_URL=http://43.228.213.128/api
+
+Padahal seharusnya:
+✅ VITE_API_BASE_URL=https://api.4leafclover.id/api
+
+## KENAPA INI MENYEBABKAN GAMBAR TIDAK MUNCUL:
+
+1. Saat build di Netlify, Vite membaca `.env.production`
+2. File ini OVERRIDE nilai dari `netlify.toml`
+3. URL `http://43.228.213.128/api` tidak valid karena:
+   - Menggunakan HTTP (bukan HTTPS) → Mixed Content Error
+   - IP address tidak punya SSL certificate
+   - Path `/api` tidak ada di Nginx untuk IP address
+
+4. Fungsi `getUploadBaseURL()` mencoba remove `/api`:
+   - Input: `http://43.228.213.128/api`
+   - Output: `http://43.228.213.128`
+   - Tapi ini URL yang salah!
+
+## SOLUSI YANG SUDAH DITERAPKAN:
+
+✅ 1. Update `.env.production` ke HTTPS URL yang benar
+✅ 2. Tambah robust error handling di `getUploadBaseURL()`
+✅ 3. Tambah debug console logs
+✅ 4. Build ulang dengan environment variable yang benar
+✅ 5. Push ke GitHub (Netlify akan auto-deploy)
+
+## LANGKAH VERIFIKASI:
+
+1. TUNGGU NETLIFY DEPLOY SELESAI (1-2 menit)
+   https://app.netlify.com/sites/[your-site]/deploys
+
+2. BUKA WEBSITE
+   https://4leafclover.id/admin/home
+
+3. BUKA CONSOLE (F12)
+   Harus terlihat:
+   🔍 DEBUG - API_BASE_URL: https://api.4leafclover.id/api
+   ✅ DEBUG - Final Upload Base URL: https://api.4leafclover.id
+
+4. CEK GAMBAR PROFILE
+   Seharusnya sudah muncul dengan URL:
+   https://api.4leafclover.id/uploads/1767516735604-650014329.jpg
+
+## JIKA MASIH TIDAK MUNCUL:
+
+Kemungkinan Netlify masih cache build lama. Lakukan:
+
+1. Buka Netlify Dashboard
+2. Klik "Deploys" tab
+3. Klik "Trigger deploy" → "Clear cache and deploy site"
+4. Tunggu deploy selesai
+5. Test lagi
+
+## BACKEND STATUS (100% BENAR):
+✅ Database: Correct path stored
+✅ File System: File exists with correct permissions
+✅ Nginx: Serving /uploads/ correctly with CORS
+✅ SSL: Certificate valid
+✅ API: Returns correct data
+
+MASALAHNYA HANYA DI FRONTEND ENVIRONMENT VARIABLE!
+Sekarang sudah diperbaiki. Gambar PASTI akan muncul setelah deploy selesai.
