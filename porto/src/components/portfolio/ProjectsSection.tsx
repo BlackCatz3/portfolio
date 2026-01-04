@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ExternalLink, Github, ArrowUpRight, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { projectsAPI, analyticsAPI } from "@/services/api";
+import { projectsAPI, analyticsAPI, getUploadBaseURL } from "@/services/api";
 import { TestimonialsModal } from "@/components/TestimonialsModal";
 
 interface Project {
@@ -110,7 +110,7 @@ export const ProjectsSection = ({ isActive = false }: ProjectsSectionProps) => {
                 <div className="aspect-[16/10] md:aspect-video bg-muted flex items-center justify-center relative overflow-hidden">
                   {project.image_url ? (
                     <img 
-                      src={`http://localhost:5000${project.image_url}`} 
+                      src={`${getUploadBaseURL()}${project.image_url}`} 
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -215,7 +215,7 @@ export const ProjectsSection = ({ isActive = false }: ProjectsSectionProps) => {
                   <div className="flex items-start justify-between mb-2 md:mb-4">
                     {project.image_url ? (
                       <img 
-                        src={`http://localhost:5000${project.image_url}`} 
+                        src={`${getUploadBaseURL()}${project.image_url}`} 
                         alt={project.title}
                         className="w-8 h-8 md:w-10 md:h-10 rounded object-cover"
                       />

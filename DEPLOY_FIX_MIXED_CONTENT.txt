@@ -1,0 +1,38 @@
+=================================================================
+🚀 DEPLOY FIX - Mixed Content Error untuk Upload Images
+=================================================================
+
+## STATUS UPDATE
+
+### ✅ FILES YANG SUDAH DIUPDATE (8/13):
+1. ✅ porto/src/services/api.js
+2. ✅ porto/src/pages/admin/AdminHome.tsx
+3. ✅ porto/src/pages/admin/AdminProjects.tsx
+4. ✅ porto/src/pages/admin/AdminProfile.tsx
+5. ✅ porto/src/pages/admin/AdminTestimonials.tsx
+6. ✅ porto/src/components/portfolio/HeroSection.tsx
+7. ✅ porto/src/components/portfolio/ProjectsSection.tsx
+
+### ⏳ FILES YANG MASIH PERLU DIUPDATE (6/13):
+8. porto/src/pages/admin/AdminCV.tsx
+9. porto/src/pages/admin/AdminCertifications.tsx
+10. porto/src/pages/admin/AdminBlog.tsx
+11. porto/src/components/TestimonialsModal.tsx
+12. porto/src/components/portfolio/ExperienceSection.tsx
+13. porto/src/components/portfolio/ContactSection.tsx
+
+=================================================================
+🔧 LANGKAH SELANJUTNYA
+=================================================================
+
+Saya akan melanjutkan update 6 file yang tersisa, lalu:
+
+1. Build frontend
+2. Commit semua perubahan
+3. Push ke GitHub
+4. Netlify auto-deploy
+5. Test upload gambar lagi
+
+Setelah selesai, Mixed Content Error akan hilang! ✅
+
+=================================================================

@@ -1,0 +1,263 @@
+=================================================================
+🔧 FIX SEMUA MASALAH DATABASE - JALANKAN INI!
+=================================================================
+
+Copy-paste perintah ini ke terminal Anda:
+
+ssh root@43.228.213.128 << 'ENDSSH'
+
+# Buat SQL script
+cat > /tmp/fix-all.sql << 'EOF'
+-- ============================================
+-- COMPLETE DATABASE SCHEMA FIX
+-- ============================================
+
+-- 1. Fix experiences - add order_index
+ALTER TABLE experiences ADD COLUMN IF NOT EXISTS order_index INTEGER DEFAULT 0;
+
+-- 2. Create about table
+CREATE TABLE IF NOT EXISTS about (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    subtitle TEXT,
+    description TEXT,
+    image_url TEXT,
+    resume_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO about (title, subtitle, description)
+SELECT 'Your Name', 'Your Title', 'Your description'
+WHERE NOT EXISTS (SELECT 1 FROM about LIMIT 1);
+
+-- 3. Create about_info table
+CREATE TABLE IF NOT EXISTS about_info (
+    id SERIAL PRIMARY KEY,
+    content TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO about_info (content)
+SELECT 'About information'
+WHERE NOT EXISTS (SELECT 1 FROM about_info LIMIT 1);
+
+-- 4. Create contact table
+CREATE TABLE IF NOT EXISTS contact (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    linkedin_url TEXT,
+    github_url TEXT,
+    twitter_url TEXT,
+    whatsapp VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO contact (email, phone)
+SELECT 'admin@4leafclover.id', '+62'
+WHERE NOT EXISTS (SELECT 1 FROM contact LIMIT 1);
+
+-- 5. Create certifications table
+CREATE TABLE IF NOT EXISTS certifications (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    issuer VARCHAR(255),
+    issue_date DATE,
+    expiry_date DATE,
+    credential_id VARCHAR(255),
+    credential_url TEXT,
+    description TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. Create messages table
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    message TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. Create skills table
+CREATE TABLE IF NOT EXISTS skills (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    proficiency INTEGER DEFAULT 0,
+    icon_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. Create testimonials table
+CREATE TABLE IF NOT EXISTS testimonials (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255),
+    company VARCHAR(255),
+    content TEXT NOT NULL,
+    rating INTEGER DEFAULT 5,
+    image_url TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. Create blog_posts table
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    excerpt TEXT,
+    featured_image TEXT,
+    author VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'draft',
+    published_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10. Create newsletter_subscribers table
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    status VARCHAR(50) DEFAULT 'active',
+    subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    unsubscribed_at TIMESTAMP
+);
+
+-- 11. Create analytics table (FIXED - sesuai dengan controller)
+CREATE TABLE IF NOT EXISTS analytics (
+    id SERIAL PRIMARY KEY,
+    event_type VARCHAR(100) NOT NULL,
+    page VARCHAR(255),
+    project_id INTEGER,
+    blog_id INTEGER,
+    ip_address VARCHAR(50),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 12. Verify all tables
+SELECT 
+    schemaname,
+    tablename,
+    tableowner
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY tablename;
+EOF
+
+echo "=== Menjalankan Database Fix ==="
+docker exec -i postgres-db psql -U postgres -d portfolio_cms_2026 < /tmp/fix-all.sql
+
+echo ""
+echo "=== Restart Backend ==="
+cd /root/backend
+docker-compose restart
+
+echo ""
+echo "=== Tunggu 5 detik ==="
+sleep 5
+
+echo ""
+echo "=== Test Endpoints ==="
+echo "1. /api/about:"
+curl -s https://api.4leafclover.id/api/about
+echo ""
+echo ""
+echo "2. /api/experiences:"
+curl -s https://api.4leafclover.id/api/experiences
+echo ""
+echo ""
+echo "3. /api/projects:"
+curl -s https://api.4leafclover.id/api/projects
+echo ""
+echo ""
+echo "4. /api/contact:"
+curl -s https://api.4leafclover.id/api/contact
+echo ""
+echo ""
+echo "5. /api/certifications:"
+curl -s https://api.4leafclover.id/api/certifications
+echo ""
+echo ""
+echo "6. /api/messages:"
+curl -s https://api.4leafclover.id/api/messages
+echo ""
+echo ""
+echo "7. /api/analytics/statistics:"
+curl -s https://api.4leafclover.id/api/analytics/statistics
+echo ""
+echo ""
+echo "=== SELESAI! ==="
+echo "Jika melihat JSON data (bukan error 500), berarti berhasil!"
+
+ENDSSH
+
+
+=================================================================
+✅ HASIL YANG DIHARAPKAN
+=================================================================
+
+Setelah menjalankan script, Anda akan melihat:
+
+✅ /api/about → {"id":1,"title":"Your Name",...}
+✅ /api/experiences → []
+✅ /api/projects → []
+✅ /api/contact → {"id":1,"email":"admin@4leafclover.id",...}
+✅ /api/certifications → []
+✅ /api/messages → []
+✅ /api/analytics/statistics → {"success":true,"data":{...}}
+
+BUKAN error 500 atau "Internal server error"!
+
+
+=================================================================
+📝 CATATAN PENTING
+=================================================================
+
+Script ini sudah diperbaiki untuk fix error analytics!
+
+Yang dilakukan:
+✅ Fix table experiences (tambah kolom order_index)
+✅ Buat table about + data default
+✅ Buat table about_info + data default
+✅ Buat table contact + data default
+✅ Buat table certifications
+✅ Buat table messages
+✅ Buat table skills
+✅ Buat table testimonials
+✅ Buat table blog_posts
+✅ Buat table newsletter_subscribers
+✅ Buat table analytics (FIXED - dengan kolom yang benar!)
+✅ Restart backend
+✅ Test semua endpoints termasuk analytics
+
+Aman dijalankan berkali-kali (IF NOT EXISTS)!
+
+
+=================================================================
+🎯 SETELAH SCRIPT SELESAI
+=================================================================
+
+1. Buka website: https://4leafclover.id
+2. Website seharusnya tidak stuck "Loading..." lagi
+3. Test login admin:
+   - URL: https://4leafclover.id/admin/login
+   - Email: admin@4leafclover.id
+   - Password: YourAdminPassword123!
+4. Semua fitur admin seharusnya berfungsi!
+5. Analytics dashboard seharusnya tidak error lagi!
+
+
+=================================================================

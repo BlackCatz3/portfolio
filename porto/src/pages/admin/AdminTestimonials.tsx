@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Edit, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { testimonialsAPI, uploadAPI, projectsAPI } from "@/services/api";
+import { testimonialsAPI, uploadAPI, projectsAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -288,7 +288,7 @@ export const AdminTestimonials = () => {
                 />
                 {formData.avatar_url && (
                   <img
-                    src={`http://localhost:5000${formData.avatar_url}`}
+                    src={`${getUploadBaseURL()}${formData.avatar_url}`}
                     alt="Avatar"
                     className="mt-2 w-16 h-16 object-cover rounded-full"
                   />
@@ -384,7 +384,7 @@ export const AdminTestimonials = () => {
               <div className="flex gap-4">
                 {testimonial.avatar_url && (
                   <img
-                    src={`http://localhost:5000${testimonial.avatar_url}`}
+                    src={`${getUploadBaseURL()}${testimonial.avatar_url}`}
                     alt={testimonial.name}
                     className="w-16 h-16 object-cover rounded-full"
                   />

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { aboutAPI, uploadAPI } from "@/services/api";
+import { aboutAPI, uploadAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -247,7 +247,7 @@ export const AdminHome = () => {
                 {homeData.profile_image && (
                   <div className="mt-4">
                     <img
-                      src={`http://localhost:5000${homeData.profile_image}`}
+                      src={`${getUploadBaseURL()}${homeData.profile_image}`}
                       alt="Profile"
                       className="w-32 h-32 object-cover rounded-full border-4 border-primary/20"
                     />

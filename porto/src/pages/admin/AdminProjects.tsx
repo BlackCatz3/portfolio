@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Edit, Trash2, ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { projectsAPI, uploadAPI } from "@/services/api";
+import { projectsAPI, uploadAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -208,7 +208,7 @@ export const AdminProjects = () => {
                 />
                 {formData.image_url && (
                   <img
-                    src={`http://localhost:5000${formData.image_url}`}
+                    src={`${getUploadBaseURL()}${formData.image_url}`}
                     alt="Preview"
                     className="mt-2 w-32 h-32 object-cover rounded"
                   />
@@ -321,7 +321,7 @@ export const AdminProjects = () => {
             <div className="aspect-video bg-muted flex items-center justify-center">
               {project.image_url ? (
                 <img
-                  src={`http://localhost:5000${project.image_url}`}
+                  src={`${getUploadBaseURL()}${project.image_url}`}
                   alt={project.title}
                   className="w-full h-full object-cover"
                 />

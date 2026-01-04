@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, Upload, FileText, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { aboutAPI, uploadAPI } from "@/services/api";
+import { aboutAPI, uploadAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -148,7 +148,7 @@ export const AdminCV = () => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(resumeUrl.startsWith('http') ? resumeUrl : `http://localhost:5000${resumeUrl}`, '_blank')}
+                  onClick={() => window.open(resumeUrl.startsWith('http') ? resumeUrl : `${getUploadBaseURL()}${resumeUrl}`, '_blank')}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Preview

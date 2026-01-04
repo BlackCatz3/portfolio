@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { testimonialsAPI } from "@/services/api";
+import { testimonialsAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 
 interface Testimonial {
@@ -130,7 +130,7 @@ export const TestimonialsModal = ({
                   <div className="flex items-center gap-4 pt-4 border-t border-border">
                     {testimonials[currentIndex].avatar_url ? (
                       <img
-                        src={`http://localhost:5000${testimonials[currentIndex].avatar_url}`}
+                        src={`${getUploadBaseURL()}${testimonials[currentIndex].avatar_url}`}
                         alt={testimonials[currentIndex].name}
                         className="w-12 h-12 rounded-full object-cover"
                       />

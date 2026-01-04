@@ -3,7 +3,7 @@ import { ArrowRight, Download, Linkedin, Github, Twitter, MessageCircle } from "
 import { Button } from "@/components/ui/button";
 import WaveDivider from "./WaveDivider";
 import { useEffect, useState } from "react";
-import { aboutAPI, contactAPI, analyticsAPI } from "@/services/api";
+import { aboutAPI, contactAPI, analyticsAPI, getUploadBaseURL } from "@/services/api";
 
 interface HeroSectionProps {
   onNavigate: (section: number) => void;
@@ -183,7 +183,7 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                 onClick={about?.resume_url ? handleCVDownload : undefined}
               >
                 {about?.resume_url ? (
-                  <a href={`http://localhost:5000${about.resume_url}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`${getUploadBaseURL()}${about.resume_url}`} target="_blank" rel="noopener noreferrer">
                     <Download className="h-4 w-4" />
                     Download CV
                   </a>
@@ -289,7 +289,7 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
                           <div className="w-full h-full rounded-[14px] bg-card flex items-center justify-center overflow-hidden">
                             {about?.profile_image ? (
                               <img 
-                                src={`http://localhost:5000${about.profile_image}`} 
+                                src={`${getUploadBaseURL()}${about.profile_image}`} 
                                 alt="Profile"
                                 className="w-full h-full object-cover"
                               />

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { contactAPI, aboutAPI, messagesAPI } from "@/services/api";
+import { contactAPI, aboutAPI, messagesAPI, getUploadBaseURL } from "@/services/api";
 
 interface ContactData {
   email: string;
@@ -124,7 +124,7 @@ export const ContactSection = () => {
       } else {
         // If it's a file path, download it
         const link = document.createElement('a');
-        link.href = `http://localhost:5000${about.resume_url}`;
+        link.href = `${getUploadBaseURL()}${about.resume_url}`;
         link.download = 'CV.pdf';
         document.body.appendChild(link);
         link.click();

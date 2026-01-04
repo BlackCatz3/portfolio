@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash2, Award, Trophy, Medal, Upload, ExternalLink } from "lucide-react";
-import { certificationsAPI, uploadAPI } from "@/services/api";
+import { certificationsAPI, uploadAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 
 export default function AdminCertifications() {
@@ -238,7 +238,7 @@ export default function AdminCertifications() {
               {formData.image_url && (
                 <div className="mt-2">
                   <img
-                    src={`http://localhost:5000${formData.image_url}`}
+                    src={`${getUploadBaseURL()}${formData.image_url}`}
                     alt="Preview"
                     className="w-32 h-32 object-cover rounded-lg border"
                   />
@@ -268,7 +268,7 @@ export default function AdminCertifications() {
               <div className="flex flex-col items-center text-center space-y-3">
                 {cert.image_url ? (
                   <img
-                    src={`http://localhost:5000${cert.image_url}`}
+                    src={`${getUploadBaseURL()}${cert.image_url}`}
                     alt={cert.title}
                     className="w-24 h-24 object-cover rounded-lg"
                   />

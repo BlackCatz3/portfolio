@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Edit, Trash2, Eye, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { blogAPI, uploadAPI } from "@/services/api";
+import { blogAPI, uploadAPI, getUploadBaseURL } from "@/services/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -261,7 +261,7 @@ export const AdminBlog = () => {
                 />
                 {formData.featured_image && (
                   <img
-                    src={`http://localhost:5000${formData.featured_image}`}
+                    src={`${getUploadBaseURL()}${formData.featured_image}`}
                     alt="Featured"
                     className="mt-2 w-full h-48 object-cover rounded"
                   />
@@ -368,7 +368,7 @@ export const AdminBlog = () => {
               <div className="flex gap-4">
                 {post.featured_image && (
                   <img
-                    src={`http://localhost:5000${post.featured_image}`}
+                    src={`${getUploadBaseURL()}${post.featured_image}`}
                     alt={post.title}
                     className="w-32 h-32 object-cover rounded"
                   />

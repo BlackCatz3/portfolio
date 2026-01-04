@@ -1,0 +1,104 @@
+=================================================================
+🔧 FIX MIXED CONTENT ERROR - Upload URLs
+=================================================================
+
+## MASALAH
+Saat upload gambar di admin panel, URL yang dikembalikan adalah:
+`http://localhost:5000/uploads/...`
+
+Ini menyebabkan Mixed Content Error karena website production menggunakan HTTPS.
+
+## SOLUSI
+Menggunakan dynamic base URL yang otomatis menyesuaikan dengan environment:
+- Development: `http://localhost:5000`
+- Production: `https://api.4leafclover.id`
+
+=================================================================
+✅ FILES YANG SUDAH DIUPDATE
+=================================================================
+
+1. ✅ porto/src/services/api.js - Added getUploadBaseURL() function
+2. ✅ porto/src/pages/admin/AdminHome.tsx
+3. ✅ porto/src/components/portfolio/HeroSection.tsx
+4. ✅ porto/src/components/portfolio/ProjectsSection.tsx
+5. ✅ porto/src/pages/admin/AdminProjects.tsx
+
+=================================================================
+⏳ FILES YANG MASIH PERLU DIUPDATE
+=================================================================
+
+6. porto/src/pages/admin/AdminTestimonials.tsx (2 locations)
+7. porto/src/pages/admin/AdminProfile.tsx (1 location)
+8. porto/src/pages/admin/AdminCV.tsx (1 location)
+9. porto/src/pages/admin/AdminCertifications.tsx (2 locations)
+10. porto/src/pages/admin/AdminBlog.tsx (2 locations)
+11. porto/src/components/TestimonialsModal.tsx (1 location)
+12. porto/src/components/portfolio/ExperienceSection.tsx (2 locations)
+13. porto/src/components/portfolio/ContactSection.tsx (1 location)
+
+=================================================================
+🚀 CARA MENJALANKAN FIX (PILIH SALAH SATU)
+=================================================================
+
+### OPSI 1: Jalankan PowerShell Script (RECOMMENDED untuk Windows)
+```powershell
+.\fix-upload-urls.ps1
+```
+
+### OPSI 2: Manual Update (jika script tidak jalan)
+Saya akan update file-file yang tersisa satu per satu.
+
+=================================================================
+📝 SETELAH SEMUA FILE DIUPDATE
+=================================================================
+
+1. Build frontend:
+```bash
+cd porto
+npm run build
+```
+
+2. Commit dan push:
+```bash
+git add .
+git commit -m "Fix: Replace hardcoded localhost URLs with dynamic base URL"
+git push
+```
+
+3. Netlify akan auto-deploy (tunggu 1-2 menit)
+
+4. Test upload gambar lagi di:
+https://4leafclover.id/admin/home
+
+5. Tidak akan ada Mixed Content Error lagi! ✅
+
+=================================================================
+🔍 TECHNICAL DETAILS
+=================================================================
+
+### What Changed:
+
+**Before:**
+```tsx
+src={`http://localhost:5000${imageUrl}`}
+```
+
+**After:**
+```tsx
+import { getUploadBaseURL } from "@/services/api";
+// ...
+src={`${getUploadBaseURL()}${imageUrl}`}
+```
+
+### How getUploadBaseURL() Works:
+
+```javascript
+export const getUploadBaseURL = () => {
+  return API_BASE_URL.replace('/api', '');
+};
+```
+
+- Development: Returns `http://localhost:5000`
+- Production: Returns `https://api.4leafclover.id`
+
+=================================================================

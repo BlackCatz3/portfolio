@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Briefcase, Award, Trophy, Medal } from "lucide-react";
 import { useEffect, useState } from "react";
-import { experiencesAPI, aboutAPI, certificationsAPI } from "@/services/api";
+import { experiencesAPI, aboutAPI, certificationsAPI, getUploadBaseURL } from "@/services/api";
 
 interface Experience {
   id: number;
@@ -127,7 +127,7 @@ export const ExperienceSection = () => {
                         >
                           {cert.image_url ? (
                             <img
-                              src={`http://localhost:5000${cert.image_url}`}
+                              src={`${getUploadBaseURL()}${cert.image_url}`}
                               alt={cert.title}
                               className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-lg mx-auto"
                             />
@@ -155,7 +155,7 @@ export const ExperienceSection = () => {
                     >
                       {cert.image_url ? (
                         <img
-                          src={`http://localhost:5000${cert.image_url}`}
+                          src={`${getUploadBaseURL()}${cert.image_url}`}
                           alt={cert.title}
                           className="w-16 h-16 md:w-24 md:h-24 object-cover rounded-lg mx-auto"
                         />
