@@ -94,14 +94,12 @@ export const AdminHome = () => {
   };
 
   const handleAddSkill = () => {
-    if (skillInput.trim() && homeData.skills.length < 3) {
+    if (skillInput.trim()) {
       setHomeData({
         ...homeData,
         skills: [...homeData.skills, skillInput.trim()],
       });
       setSkillInput("");
-    } else if (homeData.skills.length >= 3) {
-      toast.error("Maximum 3 skills for nametag card");
     }
   };
 
@@ -203,7 +201,7 @@ export const AdminHome = () => {
               </div>
 
               <div>
-                <Label htmlFor="skills">Skills Badge (Max 3)</Label>
+                <Label htmlFor="skills">Skills Badge</Label>
                 <div className="flex gap-2">
                   <Input
                     id="skills"
@@ -216,18 +214,17 @@ export const AdminHome = () => {
                       }
                     }}
                     placeholder="e.g., SQL, Selenium, JavaScript"
-                    disabled={homeData.skills.length >= 3}
                   />
                   <Button
                     type="button"
                     onClick={handleAddSkill}
-                    disabled={!skillInput.trim() || homeData.skills.length >= 3}
+                    disabled={!skillInput.trim()}
                   >
                     Add
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Skills displayed as badges in nametag card (maximum 3)
+                  Skills displayed as badges in nametag card (first 3 will be shown)
                 </p>
                 {homeData.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">

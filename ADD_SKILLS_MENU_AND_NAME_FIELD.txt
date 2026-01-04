@@ -1,0 +1,78 @@
+# Penambahan Menu Skills dan Field Name
+
+## Status: ✅ SELESAI
+
+## Perubahan yang Dilakukan
+
+### 1. Tambah Menu "Skills" di Admin Sidebar
+**File**: `porto/src/components/admin/AdminSidebar.tsx`
+- Menambahkan menu item "Skills" dengan icon Code2
+- Posisi: Setelah "About", sebelum "Experience"
+- Route: `/admin/skills`
+
+**File**: `porto/src/App.tsx`
+- Menambahkan route `/admin/skills` yang mengarah ke `AdminSkills` component
+- Membersihkan import yang tidak terpakai
+
+### 2. Tambah Field "Name" untuk Nametag Card
+**Masalah**: Di nametag card, ada 2 teks yang sama "QA Enggineer":
+- Yang pertama seharusnya **NAMA** (misal: "John Doe")
+- Yang kedua adalah **ROLE/TITLE** (misal: "QA Engineer")
+
+**Solusi**: Menambahkan field `name` terpisah dari `title`
+
+#### Database
+**File**: `add-name-column.sql`
+```sql
+ALTER TABLE about ADD COLUMN IF NOT EXISTS name VARCHAR(255);
+UPDATE about SET name = 'Your Name' WHERE name IS NULL OR name = '';
+```
+✅ Dijalankan di VPS
+
+#### Backend
+**File**: `backend/src/controllers/aboutController.js`
+- Menambahkan `name` ke parameter yang di-handle di `updateAbout()`
+- INSERT query: Menambahkan `name` sebagai parameter pertama
+- UPDATE query: Menambahkan `name` sebagai parameter pertama
+
+#### Frontend Admin
+**File**: `porto/src/pages/admin/AdminHome.tsx`
+- Menambahkan `name: ""` ke state `homeData`
+- Menambahkan `name` ke `fetchData()` untuk load dari API
+- Menambahkan input field "Name" di form (sebelum "Title / Role")
+- Label: "Name"
+- Placeholder: "e.g., John Doe, Jane Smith"
+- Help text: "Your full name displayed in nametag card"
+
+#### Frontend Display
+**File**: `porto/src/components/portfolio/HeroSection.tsx`
+- Menambahkan `name: string` ke interface `AboutData`
+- Mengubah baris 267 dari `{about?.title || 'Your Name'}` menjadi `{about?.name || 'Your Name'}`
+- Baris 270 tetap menggunakan `{about?.title || 'UI/UX Designer & Developer'}` untuk role
+
+## Hasil
+Sekarang di nametag card:
+- **Baris pertama** (nama): Menggunakan field `name` (bisa diatur di Admin > Home)
+- **Baris kedua** (role): Menggunakan field `title` (bisa diatur di Admin > Home)
+
+## Deployment
+✅ Code di-commit: `f56424a`
+✅ Code di-push ke GitHub
+✅ Database di-update di VPS
+✅ Backend di-restart di VPS
+✅ Netlify auto-deploy (dalam progress)
+
+## Cara Menggunakan
+1. Login ke admin panel: https://4leafclover.id/admin
+2. Klik menu "Home" di sidebar
+3. Isi field "Name" dengan nama Anda (misal: "John Doe")
+4. Isi field "Title / Role" dengan role Anda (misal: "QA Engineer")
+5. Klik "Save Content"
+6. Refresh homepage untuk melihat perubahan di nametag card
+
+## Menu Skills
+Menu "Skills" sekarang tersedia di admin sidebar untuk mengatur tech stack/skills dengan:
+- Nama skill
+- Level proficiency (0-100%)
+- Category
+- Order index
