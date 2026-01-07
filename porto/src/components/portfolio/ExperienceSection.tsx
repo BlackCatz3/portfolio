@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Briefcase, Award, Trophy, Medal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { experiencesAPI, aboutAPI, certificationsAPI, getUploadBaseURL } from "@/services/api";
+import WaveDivider from "./WaveDivider";
 
 interface Experience {
   id: number;
@@ -79,6 +80,8 @@ export const ExperienceSection = () => {
   }
   return (
     <section className="slide-section relative gradient-hero">
+      <WaveDivider />
+      
       <div className="container mx-auto px-3 md:px-6 py-4 pb-20 md:py-8 md:pb-16">
         <div className="max-w-6xl mx-auto space-y-3 md:space-y-8 w-full">
           {/* Header */}

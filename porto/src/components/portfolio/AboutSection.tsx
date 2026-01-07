@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { MapPin, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { aboutAPI, contactAPI, skillsAPI, aboutInfoAPI } from "@/services/api";
+import WaveDivider from "./WaveDivider";
 
 interface AboutData {
   title: string;
@@ -67,6 +68,8 @@ export const AboutSection = () => {
   }
   return (
     <section className="slide-section relative gradient-hero">
+      <WaveDivider />
+      
       <div className="container mx-auto px-4 md:px-6 py-6 pb-32 md:py-12 md:pb-24">
         <div className="max-w-6xl mx-auto space-y-8 md:space-y-16">
           {/* Header */}

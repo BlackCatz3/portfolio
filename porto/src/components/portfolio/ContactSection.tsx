@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { contactAPI, aboutAPI, messagesAPI, getUploadBaseURL } from "@/services/api";
 import ReCAPTCHA from "react-google-recaptcha";
+import WaveDivider from "./WaveDivider";
 
 interface ContactData {
   email: string;
@@ -268,6 +269,8 @@ export const ContactSection = () => {
 
   return (
     <section className="slide-section relative gradient-hero">
+      <WaveDivider />
+      
       <div className="container mx-auto px-4 md:px-6 py-6 pb-32 md:py-12 md:pb-24">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
