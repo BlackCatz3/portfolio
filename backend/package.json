@@ -1,7 +1,7 @@
 {
-  "name": "portfolio-cms-backend",
+  "name": "portfolio-zogi-backend",
   "version": "1.0.0",
-  "description": "Backend API for Portfolio CMS",
+  "description": "Backend API for Portfolio Zogi - Frontend & Backend Developer",
   "main": "src/server.js",
   "type": "module",
   "scripts": {

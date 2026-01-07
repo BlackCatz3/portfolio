@@ -54,12 +54,42 @@ export const AdminSidebar = ({ onLogout }: AdminSidebarProps) => {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+          <motion.div 
+            className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center"
+            animate={{ x: [-5, 0, -5] }}
+            transition={{ 
+              duration: 2.5, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+          >
             <span className="text-xl">✨</span>
-          </div>
+          </motion.div>
           <div>
-            <h2 className="font-heading font-bold text-sidebar-foreground">Portfolio</h2>
-            <p className="text-xs text-muted-foreground">Admin Panel</p>
+            <motion.h2 
+              className="font-heading font-bold text-sidebar-foreground"
+              animate={{ x: [-3, 0, -3] }}
+              transition={{ 
+                duration: 3, 
+                repeat: Infinity, 
+                ease: "easeInOut",
+                delay: 0.2
+              }}
+            >
+              Zogi
+            </motion.h2>
+            <motion.p 
+              className="text-xs text-muted-foreground"
+              animate={{ x: [-2, 0, -2] }}
+              transition={{ 
+                duration: 3.5, 
+                repeat: Infinity, 
+                ease: "easeInOut",
+                delay: 0.4
+              }}
+            >
+              Frontend & Backend
+            </motion.p>
           </div>
         </div>
       </div>
