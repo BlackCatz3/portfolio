@@ -79,8 +79,8 @@ export const ExperienceSection = () => {
     );
   }
   return (
-    <section className="slide-section relative gradient-hero">
-      <div className="container mx-auto px-3 md:px-6 py-4 pb-20 md:py-8 md:pb-16">
+    <section className="slide-section relative gradient-hero overflow-hidden">
+      <div className="container mx-auto px-3 md:px-6 py-4 pb-20 md:py-8 md:pb-16 relative z-10">
         <div className="max-w-6xl mx-auto space-y-3 md:space-y-8 w-full">
           {/* Header */}
           <motion.div
