@@ -76,7 +76,11 @@ export const ProjectsSection = ({ isActive = false }: ProjectsSectionProps) => {
 
   return (
     <section className="slide-section relative bg-background">
-      <div className="container mx-auto px-4 md:px-6 py-6 pb-32 md:py-12 md:pb-24">
+      {/* Grid Pattern Background */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-[0.03]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
+      
+      <div className="container mx-auto px-4 md:px-6 py-6 pb-32 md:py-12 md:pb-24 relative z-10">
         <div className="max-w-6xl mx-auto space-y-8 md:space-y-16">
           {/* Header */}
           <motion.div
