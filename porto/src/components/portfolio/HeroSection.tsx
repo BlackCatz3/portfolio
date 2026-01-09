@@ -95,8 +95,8 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
   ].filter(link => link.show);
 
   return (
-    <section className="slide-section relative flex items-center gradient-hero pt-20 md:pt-0">
-      <div className="container mx-auto px-6 py-6 pb-32 md:py-0 md:pb-0">
+    <section className="slide-section relative flex items-center gradient-hero pt-20 md:pt-0 min-h-screen">
+      <div className="container mx-auto px-6 py-8 pb-40 md:py-12 md:pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Content */}
           <motion.div
