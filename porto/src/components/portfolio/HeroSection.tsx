@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Download, Linkedin, Github, Twitter, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import WaveDivider from "./WaveDivider";
 import { useEffect, useState } from "react";
 import { aboutAPI, contactAPI, analyticsAPI, getUploadBaseURL } from "@/services/api";
 
@@ -96,10 +95,8 @@ export const HeroSection = ({ onNavigate }: HeroSectionProps) => {
   ].filter(link => link.show);
 
   return (
-    <section className="slide-section relative flex items-center gradient-hero pt-20 md:pt-0 overflow-hidden">
-      <WaveDivider />
-      
-      <div className="container mx-auto px-6 py-6 pb-40 md:py-0 md:pb-0 relative z-10">
+    <section className="slide-section relative flex items-center gradient-hero pt-20 md:pt-0">
+      <div className="container mx-auto px-6 py-6 pb-32 md:py-0 md:pb-0">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Content */}
           <motion.div
